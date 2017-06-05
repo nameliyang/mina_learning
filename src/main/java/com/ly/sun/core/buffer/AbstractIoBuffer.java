@@ -5,8 +5,19 @@ import java.nio.ByteBuffer;
 public abstract class AbstractIoBuffer extends IoBuffer {
 	
 	private boolean autoExpand;
-	
 	private boolean reCapacityAllowd = true;
+	
+	private int minimumCapacity ;
+	
+	@Override
+	public boolean isDirect() {
+		return buf().isDirect();
+	}
+	
+	@Override
+	public boolean isReadOnly() {
+		return buf().isReadOnly();
+	}
 	
 	@Override
 	public IoBuffer expand(int expectdRemaining) {
@@ -24,16 +35,18 @@ public abstract class AbstractIoBuffer extends IoBuffer {
 	
 	@Override
 	public IoBuffer capacity(int newCapacity) {
-		ByteBuffer buffer = buf();
-		int pos = buffer.position();
-		int limit = buffer.limit();
 		
-		buffer.clear();
-		ByteBuffer newBuffer = ByteBuffer.allocate(newCapacity);
-		newBuffer.put(buffer);
-		buf(newBuffer);
-		position(pos);
-		limit(limit);
+		if(newCapacity > capacity()	){
+			ByteBuffer buffer = buf();
+			int pos = buffer.position();
+			int limit = buffer.limit();
+			buffer.clear();
+			ByteBuffer newBuffer = ByteBuffer.allocate(newCapacity);
+			newBuffer.put(buffer);
+			buf(newBuffer);
+			position(pos);
+			limit(limit);
+		}
 		return this;
 	}
 	
@@ -59,6 +72,15 @@ public abstract class AbstractIoBuffer extends IoBuffer {
 		if(expectEnd > limit){
 			limit(expectEnd);
 		}
+		return this;
+	}
+	
+	@Override
+	public IoBuffer shrink() {
+		int capacity = capacity();
+		int limit = limit();
+		
+		
 		return this;
 	}
 	

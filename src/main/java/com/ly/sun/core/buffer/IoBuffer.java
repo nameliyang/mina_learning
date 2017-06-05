@@ -14,11 +14,17 @@ public abstract class IoBuffer {
 		return allocator.allocate(capacity,useDirectBuffer);
 	}
 	
+	public abstract boolean isDirect();
+	
+	public abstract boolean isReadOnly();
+	
 	public abstract ByteBuffer buf();
 	
 	public abstract IoBuffer buf(ByteBuffer buf);
 	
 	public abstract boolean isAutoExpand();
+	
+	public abstract IoBuffer shrink();
 	
 	
 	public abstract int limit();
