@@ -9,6 +9,10 @@ public abstract class AbstractIoBuffer extends IoBuffer {
 	
 	private int minimumCapacity ;
 	
+	public AbstractIoBuffer(int minimumCapacity){
+		this.minimumCapacity = minimumCapacity;
+	}
+	
 	@Override
 	public boolean isDirect() {
 		return buf().isDirect();
@@ -80,6 +84,17 @@ public abstract class AbstractIoBuffer extends IoBuffer {
 		int capacity = capacity();
 		int limit = limit();
 		
+		if(limit ==  capacity){
+			return this;
+		}
+		
+		int newCapacity = capacity;
+		int shinkCapacity = Math.max(minimumCapacity, limit);
+		
+		while(newCapacity  > shinkCapacity){
+			newCapacity>>=1;
+		}
+		newCapacity = Math.max(shinkCapacity, newCapacity);
 		
 		return this;
 	}

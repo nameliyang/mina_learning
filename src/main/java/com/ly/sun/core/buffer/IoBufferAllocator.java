@@ -18,10 +18,12 @@ public class IoBufferAllocator {
 		private ByteBuffer buf;
 		
 		public SimpleIoBuffer(ByteBuffer buf) {
+			super(buf.capacity());
 			this.buf = buf;
 		}
 		
 		public   SimpleIoBuffer(int capacity, boolean useDirectBuffer) {
+			super(capacity);
 			this.buf = useDirectBuffer?ByteBuffer.allocateDirect(capacity):ByteBuffer.allocate(capacity);
 		}
 		
