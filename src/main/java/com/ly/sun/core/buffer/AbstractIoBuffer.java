@@ -83,7 +83,7 @@ public abstract class AbstractIoBuffer extends IoBuffer {
 	public IoBuffer shrink() {
 		int capacity = capacity();
 		int limit = limit();
-		
+		// 如果limit==capacity 则返回 不做任何修改
 		if(limit ==  capacity){
 			return this;
 		}
@@ -96,6 +96,15 @@ public abstract class AbstractIoBuffer extends IoBuffer {
 		}
 		newCapacity = Math.max(shinkCapacity, newCapacity);
 		
+		ByteBuffer oldBuf = buf();
+		int oldPos = oldBuf.position();
+		int oldlimit = oldBuf.limit();
+		oldBuf.clear();
+		ByteBuffer newBuffer = oldBuf.isDirect()?ByteBuffer.allocateDirect(newCapacity):ByteBuffer.allocate(newCapacity);
+		newBuffer.put(oldBuf);
+		newBuffer.position(oldPos);
+		newBuffer.limit(oldlimit);
+		buf(newBuffer);
 		return this;
 	}
 	
@@ -195,7 +204,6 @@ public abstract class AbstractIoBuffer extends IoBuffer {
 	public boolean isAutoExpand() {
 		return autoExpand;
 	}
-	
 	
 	@Override
 	public IoBuffer setAutoExpand(boolean autoExpand) {
