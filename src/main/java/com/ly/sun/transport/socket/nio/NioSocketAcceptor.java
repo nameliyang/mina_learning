@@ -41,7 +41,7 @@ public final class NioSocketAcceptor {
 	
 	private volatile boolean selectable  = true;
 	
-	private NioProcessor processor = new NioProcessor();
+	NioProcessor processor = new NioProcessor(service);
 	
 	public NioSocketAcceptor(ExecutorService service) throws IOException{
 		this.service = service;
