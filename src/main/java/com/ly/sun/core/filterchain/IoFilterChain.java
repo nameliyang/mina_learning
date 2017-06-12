@@ -6,10 +6,9 @@ public interface IoFilterChain {
 	
 	NioSocketSession getSession();
 	
-	void addFirst(String name,IoFilter filter);
+	void addFirst( IoFilter filter);
 	
-	void addLast(String name,IoFilter filter);
-	
+	void addLast( IoFilter filter);
 	
 	void fireSessionCreated();
 	
