@@ -11,8 +11,10 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.Executor;
 import java.util.concurrent.atomic.AtomicReference;
 
+import com.ly.sun.core.buffer.IoBuffer;
 import com.ly.sun.core.filterchain.DefaultIoFilterChain;
 import com.ly.sun.core.filterchain.IoFilterChain;
+import com.ly.sun.core.session.IoSessionConfig;
 import com.ly.sun.util.NamePerservingRunnable;
 
 public class NioProcessor {
@@ -102,7 +104,36 @@ public class NioProcessor {
 	}
 
 	private void read(NioSocketSession session) {
+		IoSessionConfig config = session.getSessionConfig();
+		int bufferSize = config.getReadBufferSize();
+		IoBuffer buffer = IoBuffer.allocate(bufferSize);
 		
+		try{
+			int readBytes = 0;
+		    int rtn ;
+		    try{
+		    	while((rtn = read(session,buffer)) >0 ){
+					readBytes += rtn;
+					if(!buffer.hasRemaining()){
+						break;
+					}
+				}
+		    }finally{
+		    	buffer.flip();
+		    }
+			if(readBytes > 0){
+				
+			}
+			
+		}catch(Exception e){
+			
+		}
+	}
+
+	private int  read(NioSocketSession session,
+			IoBuffer buffer) throws IOException {
+		SocketChannel socketChannel = session.getChannel();
+		return socketChannel.read(buffer.buf());
 	}
 
 	private boolean isWritable(NioSocketSession session) {
@@ -111,8 +142,8 @@ public class NioProcessor {
 	}
 
 	private boolean isReadable(NioSocketSession session) {
-		
-		return false;
+		SelectionKey selectionKey = session.getSelectionKey();
+		return (selectionKey.isValid() && selectionKey.isReadable());
 	}
 
 	class IoSessionIterator<NioSocketSession> implements Iterator<NioSocketSession>{

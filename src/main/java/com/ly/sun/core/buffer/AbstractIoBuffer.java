@@ -214,4 +214,8 @@ public abstract class AbstractIoBuffer extends IoBuffer {
 		return this;
 	}
 	
+	@Override
+	public boolean hasRemaining() {
+		return buf().hasRemaining();
+	}
 }

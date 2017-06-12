@@ -21,6 +21,13 @@ public abstract  class  IoFilter {
 			NextFilter nextFilter = IoFilter.this.nextIoFilter.nextFilter;
 			nextIoFilter.sessionCreated(nextFilter, session);
 		}
+
+		@Override
+		public void messageReceived(NioSocketSession session, Object msg) {
+			IoFilter nextIoFilter = IoFilter.this.nextIoFilter;
+			NextFilter nextFilter = IoFilter.this.nextIoFilter.nextFilter;
+			nextIoFilter.messageReceived(nextFilter, session,msg);
+		}
 	};
 	
 	public  abstract void init() throws Exception;
@@ -29,9 +36,12 @@ public abstract  class  IoFilter {
 	
 	public abstract  void sessionCreated(NextFilter nextFilter,NioSocketSession session);
 	
+	public abstract  void messageReceived(NextFilter nextFilter,NioSocketSession session,Object msg);
 	
 	interface NextFilter{
 		
 		void sessionCreated(NioSocketSession session);
+		
+		void messageReceived(NioSocketSession session,Object msg);
 	}
 }

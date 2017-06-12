@@ -21,8 +21,16 @@ public class AbstractIoFilter extends IoFilter{
 		nextFilter.sessionCreated(session);
 	}
 	
+	
+	@Override
+	public void messageReceived(NextFilter nextFilter,
+			NioSocketSession session, Object msg) {
+		nextFilter.messageReceived(session, msg);
+	}
+	
 	@Override
 	public String toString() {
 		return "Filter:"+name;
 	}
+
 }

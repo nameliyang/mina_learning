@@ -13,7 +13,9 @@ public abstract class IoBuffer {
 	public static IoBuffer allocate(int capacity,boolean useDirectBuffer){
 		return allocator.allocate(capacity,useDirectBuffer);
 	}
-	
+	public static IoBuffer allocate(int capacity){
+		return allocate(capacity,false);
+	}
 	public abstract boolean isDirect();
 	
 	public abstract boolean isReadOnly();
@@ -61,4 +63,6 @@ public abstract class IoBuffer {
 	public abstract IoBuffer expand(int pos,int expectedRemaining);
 	
 	public abstract IoBuffer setAutoExpand(boolean autoExpand);
+	
+	public abstract boolean hasRemaining();
 }

@@ -4,6 +4,8 @@ import java.nio.channels.SelectionKey;
 import java.nio.channels.SocketChannel;
 
 import com.ly.sun.core.filterchain.IoFilterChain;
+import com.ly.sun.core.session.AbstractIoSessionConfig;
+import com.ly.sun.core.session.IoSessionConfig;
 
 public class NioSocketSession {
 	
@@ -16,6 +18,9 @@ public class NioSocketSession {
 	SelectionKey selectKey;
 	
 	IoFilterChain ioFilterChain;
+	
+	private  IoSessionConfig sessionConfig = new SessionConfigImpl();
+	
 	
 	public NioSocketSession(NioSocketAcceptor nioSocketAcceptor,
 			NioProcessor processor, SocketChannel ch) {
@@ -35,9 +40,20 @@ public class NioSocketSession {
 	public void setSelectionKey(SelectionKey selectKey) {
 		this.selectKey = selectKey;
 	}
+	
+	public SelectionKey getSelectionKey(){
+		return selectKey;
+	}
 
 	public void setIoFilterChain(IoFilterChain ioFilterChain) {
 		this.ioFilterChain = ioFilterChain;
 	}
 	
+	public IoSessionConfig getSessionConfig(){
+		return sessionConfig;
+	}
+	
+	class SessionConfigImpl extends AbstractIoSessionConfig{
+		
+	}
 }
