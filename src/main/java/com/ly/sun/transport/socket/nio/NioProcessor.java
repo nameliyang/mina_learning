@@ -4,11 +4,15 @@ import java.io.IOException;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.nio.channels.SocketChannel;
+import java.util.Iterator;
 import java.util.Queue;
+import java.util.Set;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.Executor;
 import java.util.concurrent.atomic.AtomicReference;
 
+import com.ly.sun.core.filterchain.DefaultIoFilterChain;
+import com.ly.sun.core.filterchain.IoFilterChain;
 import com.ly.sun.util.NamePerservingRunnable;
 
 public class NioProcessor {
@@ -60,6 +64,11 @@ public class NioProcessor {
 			for(;;){
 				try {
 					int select = selector.select();
+					int nSessions = handlerNewSessioins();
+					
+					if(select >0){
+						process();
+					}
 					
 				} catch (IOException e) {
 					e.printStackTrace();
@@ -67,7 +76,70 @@ public class NioProcessor {
 				
 			}
 		}
+
 	}
+	
+	private void process() {
+		IoSessionIterator<NioSocketSession> ioSessionIterator 
+			= new IoSessionIterator<NioSocketSession>(selector.selectedKeys());
+		
+		while(ioSessionIterator.hasNext()){
+			NioSocketSession session = ioSessionIterator.next();
+			ioSessionIterator.remove();
+			process(session);
+		}
+	}
+	
+	
+	
+	public void process(NioSocketSession session) {
+		if(isReadable(session)){
+			read(session);
+		}
+		if(isWritable(session)){
+			
+		}
+	}
+
+	private void read(NioSocketSession session) {
+		
+	}
+
+	private boolean isWritable(NioSocketSession session) {
+		
+		return false;
+	}
+
+	private boolean isReadable(NioSocketSession session) {
+		
+		return false;
+	}
+
+	class IoSessionIterator<NioSocketSession> implements Iterator<NioSocketSession>{
+		 private final Iterator<SelectionKey> iterator;
+		 
+		public IoSessionIterator(Set<SelectionKey> keys) {
+			iterator = keys.iterator();
+		}
+		
+		@Override
+		public boolean hasNext() {
+			return iterator.hasNext();
+		}
+
+		@Override
+		public NioSocketSession next() {
+			SelectionKey key = iterator.next();
+			NioSocketSession nioSession = (NioSocketSession) key.attachment();
+			return nioSession;
+		}
+		
+		@Override
+		public void remove() {
+			iterator.remove();
+		}
+	}
+	
 	
 	public int handlerNewSessioins(){
 		int addedSessions = 0;
@@ -83,10 +155,16 @@ public class NioProcessor {
 		boolean registered = false;
 		try{
 			init(session);
-		}catch(Exception e){
 			
+			IoFilterChain ioFilterChain = new DefaultIoFilterChain(session);
+			ioFilterChain.fireSessionCreated();
+			
+			session.setIoFilterChain(ioFilterChain);
+			registered = true;
+		}catch(Exception e){
+			e.printStackTrace();
 		}
-		return false;
+		return registered;
 	}
 
 	private void init(NioSocketSession session) throws IOException {
