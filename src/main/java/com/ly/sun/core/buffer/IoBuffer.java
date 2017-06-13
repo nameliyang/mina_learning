@@ -65,4 +65,8 @@ public abstract class IoBuffer {
 	public abstract IoBuffer setAutoExpand(boolean autoExpand);
 	
 	public abstract boolean hasRemaining();
+
+	public abstract  IoBuffer put(IoBuffer buf) ;
+
+	public abstract int remaining() ;
 }

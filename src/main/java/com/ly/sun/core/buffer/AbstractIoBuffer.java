@@ -218,4 +218,14 @@ public abstract class AbstractIoBuffer extends IoBuffer {
 	public boolean hasRemaining() {
 		return buf().hasRemaining();
 	}
+	
+	@Override
+	public IoBuffer put(IoBuffer buf) {
+		return put(buf.buf());
+	}
+	
+	@Override
+	public int remaining() {
+		return buf().remaining();
+	}
 }
