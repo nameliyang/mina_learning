@@ -38,7 +38,7 @@ public abstract  class  IoFilter {
 	
 	public abstract  void messageReceived(NextFilter nextFilter,NioSocketSession session,Object msg);
 	
-	interface NextFilter{
+	public interface NextFilter{
 		
 		void sessionCreated(NioSocketSession session);
 		

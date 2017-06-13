@@ -3,7 +3,6 @@ package com.ly.sun.transport.socket.nio;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.SocketAddress;
-import java.nio.channels.SelectableChannel;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.nio.channels.ServerSocketChannel;
