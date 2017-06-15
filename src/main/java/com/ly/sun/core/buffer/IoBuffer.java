@@ -68,5 +68,12 @@ public abstract class IoBuffer {
 
 	public abstract  IoBuffer put(IoBuffer buf) ;
 
+	public abstract IoBuffer get(byte[] dst,int offset,int length);
+	
+	public abstract IoBuffer get(byte[] dst);
+	
+	
 	public abstract int remaining() ;
+
+	public abstract IoBuffer clear() ;
 }

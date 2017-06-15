@@ -39,7 +39,6 @@ public abstract class AbstractIoBuffer extends IoBuffer {
 	
 	@Override
 	public IoBuffer capacity(int newCapacity) {
-		
 		if(newCapacity > capacity()	){
 			ByteBuffer buffer = buf();
 			int pos = buffer.position();
@@ -225,7 +224,24 @@ public abstract class AbstractIoBuffer extends IoBuffer {
 	}
 	
 	@Override
+	public IoBuffer get(byte[] dst) {
+		return get(dst,0,dst.length);
+	}
+	
+	@Override
+	public IoBuffer get(byte[] dst, int offset, int length) {
+		buf().get(dst, offset, length);
+		return this;
+	}
+	
+	@Override
 	public int remaining() {
 		return buf().remaining();
+	}
+	
+	@Override
+	public IoBuffer clear() {
+		buf().clear();
+		return this;
 	}
 }
