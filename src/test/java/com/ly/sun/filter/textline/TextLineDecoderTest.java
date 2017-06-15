@@ -1,5 +1,6 @@
 package com.ly.sun.filter.textline;
 
+import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 import java.util.Queue;
 
@@ -8,7 +9,6 @@ import com.ly.sun.core.filterchain.AbstractIoFilter;
 import com.ly.sun.core.filterchain.DefaultIoFilterChain;
 import com.ly.sun.core.filterchain.IoFilterChain;
 import com.ly.sun.filter.codec.AbstractProtocolDecoderOutput;
-import com.ly.sun.filter.codec.ProtocolDecoderOutput;
 import com.ly.sun.filter.codec.textline.TextLineDecoder;
 import com.ly.sun.transport.socket.nio.NioSocketSession;
 
@@ -17,14 +17,22 @@ public class TextLineDecoderTest {
 	
 	public static void main(String[] args) {
 		IoFilterChain ioFilterChain = new DefaultIoFilterChain(new NioSocketSession(null, null, null));
-		ioFilterChain.fireMessageReceived("");
+		ioFilterChain.addLast(new LoggerFilter("loggerFilter"));
+		ioFilterChain.addLast(new TextLineFilter("textLineDecoder"));
+		String str = "1234\r\nsdf";
+		
+		IoBuffer  ioBuffer = IoBuffer.wrap(ByteBuffer.wrap(str.getBytes()));
+		
+		ioFilterChain.fireMessageReceived(ioBuffer);
 	}
 }
 
 class LoggerFilter extends AbstractIoFilter{
+	
 	public LoggerFilter(String name) {
 		super(name);
 	}
+	
 	@Override
 	public void messageReceived(NextFilter nextFilter,
 			NioSocketSession session, Object msg) {

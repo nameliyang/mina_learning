@@ -30,8 +30,7 @@ public class TextLineDecoder implements ProtocolDecoder{
 		
 		Context context = getContext(session);
 		
-		decode(session, in, out);
-		
+		decodeAuto(context, session, in, out);
 	}
 	
 	
