@@ -12,7 +12,10 @@ import com.ly.sun.filter.codec.ProtocolDecoderOutput;
 import com.ly.sun.transport.socket.nio.NioSocketSession;
 
 public class TextLineDecoder implements ProtocolDecoder{
+	private static final String CONTEXT = "CONTEXT";
     private final Charset charset;
+    
+    private int bufferLength = 128;
     
     public TextLineDecoder(Charset charset){
     	this.charset = charset;
@@ -24,14 +27,21 @@ public class TextLineDecoder implements ProtocolDecoder{
     
 	@Override
 	public void decode(NioSocketSession session, IoBuffer in, ProtocolDecoderOutput out) throws Exception {
-		getContext(session);
+		
+		Context context = getContext(session);
+		
+		decode(session, in, out);
 		
 	}
 	
 	
 	private Context getContext(NioSocketSession session) {
-		
-		return null;
+		Object context = session.getAttribute(CONTEXT);
+		if(context == null){
+			  context = new Context(bufferLength);
+			  session.setAttributeIfAbsent(CONTEXT, context);
+		}
+		return (Context) session.getAttribute(CONTEXT);
 	}
 
 	public void decodeAuto(Context context,NioSocketSession session,IoBuffer in,ProtocolDecoderOutput out) throws CharacterCodingException{
