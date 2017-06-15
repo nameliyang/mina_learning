@@ -47,6 +47,13 @@ public class DefaultIoFilterChain implements IoFilterChain {
 		header.sessionCreated(nextFilter, session);
 	}
 	
+
+	@Override
+	public void fireMessageReceived(Object message) {
+		NextFilter nextFilter = header.nextFilter;
+		header.messageReceived(nextFilter,session,message);
+	}
+	
 	class HeaderFilter extends AbstractIoFilter{
 		public HeaderFilter() {
 			super("headFilter");
@@ -69,5 +76,6 @@ public class DefaultIoFilterChain implements IoFilterChain {
 			System.out.println("session created...");
 		}
 	}
+
 	
 }

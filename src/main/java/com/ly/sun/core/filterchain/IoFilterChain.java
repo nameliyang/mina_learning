@@ -12,6 +12,6 @@ public interface IoFilterChain {
 	
 	void fireSessionCreated();
 	
-	
+	void fireMessageReceived(Object message);
 	
 }
