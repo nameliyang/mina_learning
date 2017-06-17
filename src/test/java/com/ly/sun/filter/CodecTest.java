@@ -6,6 +6,7 @@ import java.nio.CharBuffer;
 import java.nio.charset.Charset;
 import java.nio.charset.CharsetDecoder;
 import java.nio.charset.CoderResult;
+import java.util.ArrayList;
 
 public class CodecTest {
 	private static void extendCharBuffer(CharBuffer charBuffer) {
@@ -15,6 +16,8 @@ public class CodecTest {
 		CharBuffer newcharBuffer = CharBuffer.allocate(charBuffer.capacity()<<1);
 		charBuffer.clear();
 		newcharBuffer.put(charBuffer);
+		
+	    new ArrayList<String>().contains(null);
 	}
 	
 	

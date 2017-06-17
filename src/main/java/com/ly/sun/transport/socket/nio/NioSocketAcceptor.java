@@ -17,6 +17,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.logging.Logger;
 
+import com.ly.sun.core.service.IoHandler;
 import com.ly.sun.util.NamePerservingRunnable;
 
 public final class NioSocketAcceptor {
@@ -42,6 +43,8 @@ public final class NioSocketAcceptor {
 	
 	NioProcessor processor = new NioProcessor(service);
 	
+	private IoHandler ioHandler;
+	
 	public NioSocketAcceptor(ExecutorService service) throws IOException{
 		this.service = service;
 		init();
@@ -51,6 +54,17 @@ public final class NioSocketAcceptor {
 		this(DEFAULT_SERVICE);
 	}
 	
+	public void setHandler(IoHandler ioHandler){
+		if(ioHandler == null){
+			throw new IllegalArgumentException("handler cannot be null");
+		}
+		
+		this.ioHandler = ioHandler;
+	}
+	
+	public IoHandler getHandler(){
+		return ioHandler;
+	}
 	
 	public void init() throws IOException{
 		selector = Selector.open();

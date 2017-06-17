@@ -6,12 +6,18 @@ import java.nio.charset.CharacterCodingException;
 import java.nio.charset.Charset;
 import java.nio.charset.CharsetDecoder;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.ly.sun.core.buffer.IoBuffer;
 import com.ly.sun.filter.codec.ProtocolDecoder;
 import com.ly.sun.filter.codec.ProtocolDecoderOutput;
 import com.ly.sun.transport.socket.nio.NioSocketSession;
 
 public class TextLineDecoder implements ProtocolDecoder{
+	
+	private static final Logger logger = LoggerFactory.getLogger(TextLineDecoder.class);
+	
 	private static final String CONTEXT = "CONTEXT";
     private final Charset charset;
     
@@ -54,6 +60,7 @@ public class TextLineDecoder implements ProtocolDecoder{
 			switch (b) {
 			case '\r':
 				matchCount++;
+				break;
 			case '\n':
 				matchCount++;
 				matched = true;
@@ -83,14 +90,23 @@ public class TextLineDecoder implements ProtocolDecoder{
 				    String str = charBuffer.toString();
 	                writeText(session, str, out);
 				}finally{
+					oldPos = pos;
 					ioBuffer.clear();
 				}
 				
 			}
 		}
+		in.position(oldPos);
+		in.limit(oldLimit);
+		if(in.hasRemaining()){
+			context.append(in);
+		}
 	}
 	
 	 private void writeText(NioSocketSession session, String text, ProtocolDecoderOutput out) {
+		 if(logger.isDebugEnabled()){
+			 logger.debug("write msg {}",text);
+		 }
 		 out.write(text);
 	 }
 
@@ -110,7 +126,7 @@ public class TextLineDecoder implements ProtocolDecoder{
 		}
 
 		public void append(IoBuffer ioBuffer){
-			getIoBuffer().put(buf);
+			getIoBuffer().put(ioBuffer);
 		}
 		
 		public IoBuffer getIoBuffer(){

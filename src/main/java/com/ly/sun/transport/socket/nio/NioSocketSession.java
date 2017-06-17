@@ -5,10 +5,12 @@ import java.nio.channels.SocketChannel;
 import java.util.concurrent.ConcurrentHashMap;
 
 import com.ly.sun.core.filterchain.IoFilterChain;
+import com.ly.sun.core.service.IoHandler;
 import com.ly.sun.core.session.AbstractIoSessionConfig;
+import com.ly.sun.core.session.IoSession;
 import com.ly.sun.core.session.IoSessionConfig;
 
-public class NioSocketSession {
+public class NioSocketSession implements IoSession {
 	
 	NioSocketAcceptor acceptor;
 	
@@ -24,8 +26,11 @@ public class NioSocketSession {
 	
 	private ConcurrentHashMap<Object, Object> attributes = new ConcurrentHashMap<Object, Object>();	
 	
+	IoHandler ioHandler;
+	
 	public NioSocketSession(NioSocketAcceptor nioSocketAcceptor,
 			NioProcessor processor, SocketChannel ch) {
+		this.ioHandler = nioSocketAcceptor.getHandler();
 		this.processor = processor;
 		this.acceptor = nioSocketAcceptor;
 		this.socketChannel = ch;
@@ -55,19 +60,27 @@ public class NioSocketSession {
 		return sessionConfig;
 	}
 	
-	
+	@Override
 	public Object getAttribute(Object key){
 		return attributes.get(key);
 	}
 	
+	@Override
 	public void setAttribute(Object key,Object value){
 		attributes.put(key, value);
 	}
 	
+	@Override
 	public void setAttributeIfAbsent(Object key,Object value){
 		  attributes.putIfAbsent(key, value);
 	}
 	class SessionConfigImpl extends AbstractIoSessionConfig{
 		
+	}
+	
+	
+	@Override
+	public IoHandler getHandler() {
+		return ioHandler;
 	}
 }

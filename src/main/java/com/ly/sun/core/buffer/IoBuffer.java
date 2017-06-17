@@ -13,9 +13,11 @@ public abstract class IoBuffer {
 	public static IoBuffer allocate(int capacity,boolean useDirectBuffer){
 		return allocator.allocate(capacity,useDirectBuffer);
 	}
+	
 	public static IoBuffer allocate(int capacity){
 		return allocate(capacity,false);
 	}
+	
 	public abstract boolean isDirect();
 	
 	public abstract boolean isReadOnly();
@@ -76,4 +78,9 @@ public abstract class IoBuffer {
 	public abstract int remaining() ;
 
 	public abstract IoBuffer clear() ;
+	
+	@Override
+	public String toString() {
+		return buf().toString();
+	}
 }

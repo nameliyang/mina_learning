@@ -16,14 +16,16 @@ import com.ly.sun.transport.socket.nio.NioSocketSession;
 public class TextLineDecoderTest {
 	
 	public static void main(String[] args) {
+		 
 		IoFilterChain ioFilterChain = new DefaultIoFilterChain(new NioSocketSession(null, null, null));
 		ioFilterChain.addLast(new LoggerFilter("loggerFilter"));
 		ioFilterChain.addLast(new TextLineFilter("textLineDecoder"));
-		String str = "1234\r\nsdf";
+		String str = "1234\r\nsdf\r\n12321312";
 		
-		IoBuffer  ioBuffer = IoBuffer.wrap(ByteBuffer.wrap(str.getBytes()));
-		
+		ByteBuffer byteBuffer = ByteBuffer.wrap(str.getBytes());
+		IoBuffer  ioBuffer = IoBuffer.wrap(byteBuffer);
 		ioFilterChain.fireMessageReceived(ioBuffer);
+		ioFilterChain.fireMessageReceived(IoBuffer.wrap(ByteBuffer.wrap("456\r\n".getBytes())));
 	}
 }
 
@@ -59,8 +61,8 @@ class TextLineFilter extends AbstractIoFilter{
 		try {
 			decoder.decode(session, buffer, output);
 			Queue<Object> messages = output.getMessages();
-			IoBuffer ioBuffer = null;
-			while((ioBuffer = (IoBuffer) messages.poll())!=null){
+			String ioBuffer = null;
+			while((ioBuffer = (String) messages.poll())!=null){
 				System.out.println(ioBuffer);
 			}
 			
