@@ -1,6 +1,7 @@
 package com.ly.sun.transport.socket.nio;
 
 import java.io.IOException;
+import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.SocketAddress;
 import java.nio.channels.SelectionKey;
@@ -11,7 +12,9 @@ import java.nio.channels.spi.SelectorProvider;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
+import java.util.Queue;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicReference;
@@ -27,9 +30,10 @@ public final class NioSocketAcceptor {
 	SelectorProvider selectorProvider = null;
 	
 	Selector selector ; 
+	
 	private boolean reuseAddress = false;
 	
-	SocketAddress localAddress;
+	Queue<SocketAddress> localAddresses = new ConcurrentLinkedQueue<SocketAddress>();
 	
 	private AtomicReference<Acceptor> acceptorRef = new AtomicReference<Acceptor>();
 		
@@ -41,12 +45,13 @@ public final class NioSocketAcceptor {
 	
 	private volatile boolean selectable  = true;
 	
-	NioProcessor processor = new NioProcessor(service);
+	NioProcessor processor;
 	
 	private IoHandler ioHandler;
 	
 	public NioSocketAcceptor(ExecutorService service) throws IOException{
 		this.service = service;
+		 processor = new NioProcessor(service);
 		init();
 	}
 	
@@ -90,6 +95,7 @@ public final class NioSocketAcceptor {
 				throw e;
 			}
 			serverSocketChannel.register(selector, SelectionKey.OP_ACCEPT);
+			success = true;
 		} finally {
 			if(!success){
 				close(serverSocketChannel);
@@ -107,7 +113,7 @@ public final class NioSocketAcceptor {
 	}
 	
 	public void bind(SocketAddress localAddress){
-		this.localAddress = localAddress;
+		localAddresses.add(localAddress);
 		startupAcceptor();
 	}
 	
@@ -184,15 +190,20 @@ public final class NioSocketAcceptor {
 		return new NioSocketSession(this,processor,ch);
 	}
 
-	private int registerHandlers() throws Exception{
+	private int registerHandlers() {
+		
+		int bounds = 0;
 		try{
-			ServerSocketChannel serverChannel = open(localAddress);
-			boundHandlers.put(serverChannel.getLocalAddress(), serverChannel);
+			for(SocketAddress localAddress = localAddresses.poll();localAddress !=  null;localAddress = localAddresses.poll()){
+				ServerSocketChannel serverChannel = open(localAddress);
+				boundHandlers.put(serverChannel.getLocalAddress(), serverChannel);
+				bounds++;
+			}
 		}catch(Exception e){
 			e.printStackTrace();
-			return 0;
+		}finally{
 		}
-		return 1;
+		return bounds;
 	}
 	
 	public int select() throws IOException{
@@ -230,6 +241,10 @@ public final class NioSocketAcceptor {
 			return nextKey;
 		}
 		
+		@Override
+		public void remove() {
+			iterator.remove();
+		}
 	}
 	
 }
