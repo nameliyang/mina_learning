@@ -1,6 +1,6 @@
 package com.ly.sun.filter.codec;
 
-import com.ly.sun.transport.socket.nio.NioSocketSession;
+import com.ly.sun.core.session.IoSession;
 
 /**
  * 解码器工厂类
@@ -10,9 +10,9 @@ import com.ly.sun.transport.socket.nio.NioSocketSession;
 public interface ProtocolCodecFactory {
 	
 	
-	ProtocolEncoder getProtocolEncoder(NioSocketSession session	);
+	ProtocolEncoder getProtocolEncoder(IoSession session);
 	
 	
-	ProtocolDecoder getProtocolDecoder(NioSocketSession session);
+	ProtocolDecoder getProtocolDecoder(IoSession session);
 	
 }

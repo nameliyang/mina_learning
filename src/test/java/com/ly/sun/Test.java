@@ -1,13 +1,16 @@
 package com.ly.sun;
 
-import java.io.IOException;
-import java.net.InetSocketAddress;
-
-import com.ly.sun.transport.socket.nio.NioSocketAcceptor;
-
 public class Test {
-	public static void main(String[] args) throws IOException {
-		NioSocketAcceptor acceptor = new NioSocketAcceptor();
-		acceptor.bind(new InetSocketAddress(1234));
+	public static void main(String[] args) {
+		char c = '\r';
+		
+		switch (c) {
+		case '\r':
+			System.out.println("r");
+		case '\n':
+			System.out.println("n");
+		default:
+			break;
+		}
 	}
 }
