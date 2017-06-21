@@ -1,6 +1,6 @@
 package com.ly.sun.core.filterchain;
 
-import com.ly.sun.transport.socket.nio.NioSocketSession;
+import com.ly.sun.core.session.IoSession;
 
 public class AbstractIoFilter extends IoFilter{
 	
@@ -17,14 +17,14 @@ public class AbstractIoFilter extends IoFilter{
 	}
 	
 	@Override
-	public void sessionCreated(NextFilter nextFilter, NioSocketSession session) {
+	public void sessionCreated(NextFilter nextFilter, IoSession session) {
 		nextFilter.sessionCreated(session);
 	}
 	
 	
 	@Override
 	public void messageReceived(NextFilter nextFilter,
-			NioSocketSession session, Object msg) {
+			IoSession session, Object msg) {
 		nextFilter.messageReceived(session, msg);
 	}
 	

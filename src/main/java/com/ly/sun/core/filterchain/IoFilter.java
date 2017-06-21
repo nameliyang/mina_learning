@@ -1,5 +1,6 @@
 package com.ly.sun.core.filterchain;
 
+import com.ly.sun.core.session.IoSession;
 import com.ly.sun.transport.socket.nio.NioSocketSession;
 
 public abstract  class  IoFilter {
@@ -16,14 +17,14 @@ public abstract  class  IoFilter {
 	
 	NextFilter nextFilter = new NextFilter() {
 		@Override
-		public void sessionCreated(NioSocketSession session) {
+		public void sessionCreated(IoSession session) {
 			IoFilter nextIoFilter = IoFilter.this.nextIoFilter;
 			NextFilter nextFilter = IoFilter.this.nextIoFilter.nextFilter;
 			nextIoFilter.sessionCreated(nextFilter, session);
 		}
 
 		@Override
-		public void messageReceived(NioSocketSession session, Object msg) {
+		public void messageReceived(IoSession session, Object msg) {
 			IoFilter nextIoFilter = IoFilter.this.nextIoFilter;
 			NextFilter nextFilter = IoFilter.this.nextIoFilter.nextFilter;
 			nextIoFilter.messageReceived(nextFilter, session,msg);
@@ -34,15 +35,15 @@ public abstract  class  IoFilter {
 	
 	public abstract  void destory() throws Exception;
 	
-	public abstract  void sessionCreated(NextFilter nextFilter,NioSocketSession session);
+	public abstract  void sessionCreated(NextFilter nextFilter,IoSession session);
 	
-	public abstract  void messageReceived(NextFilter nextFilter,NioSocketSession session,Object msg);
+	public abstract  void messageReceived(NextFilter nextFilter,IoSession session,Object msg);
 	
 	public interface NextFilter{
 		
-		void sessionCreated(NioSocketSession session);
+		void sessionCreated(IoSession session);
 		
-		void messageReceived(NioSocketSession session,Object msg);
+		void messageReceived(IoSession session,Object msg);
 	}
 
 }

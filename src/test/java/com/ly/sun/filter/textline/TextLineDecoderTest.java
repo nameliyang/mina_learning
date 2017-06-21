@@ -8,6 +8,7 @@ import com.ly.sun.core.buffer.IoBuffer;
 import com.ly.sun.core.filterchain.AbstractIoFilter;
 import com.ly.sun.core.filterchain.DefaultIoFilterChain;
 import com.ly.sun.core.filterchain.IoFilterChain;
+import com.ly.sun.core.session.IoSession;
 import com.ly.sun.filter.codec.AbstractProtocolDecoderOutput;
 import com.ly.sun.filter.codec.textline.TextLineDecoder;
 import com.ly.sun.transport.socket.nio.NioSocketSession;
@@ -37,7 +38,7 @@ class LoggerFilter extends AbstractIoFilter{
 	
 	@Override
 	public void messageReceived(NextFilter nextFilter,
-			NioSocketSession session, Object msg) {
+			IoSession session, Object msg) {
 		System.out.println("loggerFilter start");
 		nextFilter.messageReceived(session, msg);
 		System.out.println("loggerFilter end");
@@ -53,7 +54,7 @@ class TextLineFilter extends AbstractIoFilter{
 	
 	@Override
 	public void messageReceived(NextFilter nextFilter,
-			NioSocketSession session, Object msg) {
+			IoSession session, Object msg) {
 		IoBuffer buffer = (IoBuffer) msg;
 		
 		AbstractProtocolDecoderOutput output = new AbstractProtocolDecoderOutput() {

@@ -5,8 +5,8 @@ import java.util.Queue;
 
 import com.ly.sun.core.buffer.IoBuffer;
 import com.ly.sun.core.filterchain.AbstractIoFilter;
+import com.ly.sun.core.session.IoSession;
 import com.ly.sun.filter.codec.AbstractProtocolDecoderOutput;
-import com.ly.sun.transport.socket.nio.NioSocketSession;
 
 public class TextLineFilter extends AbstractIoFilter{
 	
@@ -18,7 +18,7 @@ public class TextLineFilter extends AbstractIoFilter{
 	
 	@Override
 	public void messageReceived(NextFilter nextFilter,
-			NioSocketSession session, Object msg) {
+			IoSession session, Object msg) {
 		IoBuffer buffer = (IoBuffer) msg;
 		AbstractProtocolDecoderOutput output = new AbstractProtocolDecoderOutput() {
 		};

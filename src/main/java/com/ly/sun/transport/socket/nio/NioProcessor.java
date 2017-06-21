@@ -37,7 +37,6 @@ public class NioProcessor {
 			throw new IllegalArgumentException();
 		}
 		this.executor = executor;
-		this.selector = selecor;
 	}
 	
 	public void add(NioSocketSession nioSession) {

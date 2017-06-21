@@ -2,6 +2,7 @@ package com.ly.sun.core.filterchain;
 
 import java.nio.channels.SocketChannel;
 
+import com.ly.sun.core.session.IoSession;
 import com.ly.sun.transport.socket.nio.NioProcessor;
 import com.ly.sun.transport.socket.nio.NioSocketAcceptor;
 import com.ly.sun.transport.socket.nio.NioSocketSession;
@@ -16,7 +17,7 @@ public class FilterChainTest {
 		
 		chain.addLast(new AbstractIoFilter("loggerA"){
 			@Override
-			public void sessionCreated(NextFilter nextFilter, NioSocketSession session) {
+			public void sessionCreated(NextFilter nextFilter, IoSession session) {
 				System.out.println("loggerA filter before...");
 				nextFilter.sessionCreated(session);
 				System.out.println("loggerA filter after...");
@@ -25,7 +26,7 @@ public class FilterChainTest {
 		
 		chain.addLast(new AbstractIoFilter("loggerB"){
 			@Override
-			public void sessionCreated(NextFilter nextFilter, NioSocketSession session) {
+			public void sessionCreated(NextFilter nextFilter, IoSession session) {
 				System.out.println("loggerB filter before...");
 				nextFilter.sessionCreated(session);
 				System.out.println("loggerB filter after...");
@@ -34,7 +35,7 @@ public class FilterChainTest {
 		
 		chain.addLast(new AbstractIoFilter("loggerC"){
 			@Override
-			public void sessionCreated(NextFilter nextFilter, NioSocketSession session) {
+			public void sessionCreated(NextFilter nextFilter, IoSession session) {
 				System.out.println("loggerC filter before...");
 				nextFilter.sessionCreated(session);
 				System.out.println("loggerC filter after...");
