@@ -10,9 +10,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.ly.sun.core.buffer.IoBuffer;
+import com.ly.sun.core.session.IoSession;
 import com.ly.sun.filter.codec.ProtocolDecoder;
 import com.ly.sun.filter.codec.ProtocolDecoderOutput;
-import com.ly.sun.transport.socket.nio.NioSocketSession;
 
 public class TextLineDecoder implements ProtocolDecoder{
 	
@@ -32,15 +32,13 @@ public class TextLineDecoder implements ProtocolDecoder{
 	}
     
 	@Override
-	public void decode(NioSocketSession session, IoBuffer in, ProtocolDecoderOutput out) throws Exception {
-		
+	public void decode(IoSession session, IoBuffer in, ProtocolDecoderOutput out) throws Exception {
 		Context context = getContext(session);
-		
 		decodeAuto(context, session, in, out);
 	}
 	
 	
-	private Context getContext(NioSocketSession session) {
+	private Context getContext(IoSession session) {
 		Object context = session.getAttribute(CONTEXT);
 		if(context == null){
 			  context = new Context(bufferLength);
@@ -49,7 +47,7 @@ public class TextLineDecoder implements ProtocolDecoder{
 		return (Context) session.getAttribute(CONTEXT);
 	}
 
-	public void decodeAuto(Context context,NioSocketSession session,IoBuffer in,ProtocolDecoderOutput out) throws CharacterCodingException{
+	public void decodeAuto(Context context,IoSession session,IoBuffer in,ProtocolDecoderOutput out) throws CharacterCodingException{
 		int oldPos = in.position();
 		int oldLimit = in.limit();
 		int matchCount = context.getMatchCount();
@@ -103,7 +101,7 @@ public class TextLineDecoder implements ProtocolDecoder{
 		}
 	}
 	
-	 private void writeText(NioSocketSession session, String text, ProtocolDecoderOutput out) {
+	 private void writeText(IoSession session, String text, ProtocolDecoderOutput out) {
 		 if(logger.isDebugEnabled()){
 			 logger.debug("write msg {}",text);
 		 }
