@@ -15,6 +15,7 @@ import com.ly.sun.core.buffer.IoBuffer;
 import com.ly.sun.core.filterchain.DefaultIoFilterChain;
 import com.ly.sun.core.filterchain.IoFilterChain;
 import com.ly.sun.core.session.IoSessionConfig;
+import com.ly.sun.filter.codec.textline.TextLineFilter;
 import com.ly.sun.util.NamePerservingRunnable;
 
 public class NioProcessor {
@@ -108,7 +109,6 @@ public class NioProcessor {
 		IoSessionConfig config = session.getSessionConfig();
 		int bufferSize = config.getReadBufferSize();
 		IoBuffer buffer = IoBuffer.allocate(bufferSize);
-		
 		try{
 			int readBytes = 0;
 		    int rtn ;
@@ -123,7 +123,8 @@ public class NioProcessor {
 		    	buffer.flip();
 		    }
 			if(readBytes > 0){
-				
+				IoFilterChain ioFilterChain = session.getIoFilterChain();
+				ioFilterChain.fireMessageReceived(buffer);
 			}
 			
 		}catch(Exception e){
@@ -189,6 +190,7 @@ public class NioProcessor {
 			init(session);
 			
 			IoFilterChain ioFilterChain = new DefaultIoFilterChain(session);
+			ioFilterChain.addLast(new TextLineFilter("textLineDecoder"));
 			ioFilterChain.fireSessionCreated();
 			
 			session.setIoFilterChain(ioFilterChain);

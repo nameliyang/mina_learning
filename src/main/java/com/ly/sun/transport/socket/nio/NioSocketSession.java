@@ -83,4 +83,9 @@ public class NioSocketSession implements IoSession {
 	public IoHandler getHandler() {
 		return ioHandler;
 	}
+
+	@Override
+	public IoFilterChain getIoFilterChain() {
+		return ioFilterChain;
+	}
 }
