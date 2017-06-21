@@ -4,14 +4,14 @@ import java.util.LinkedList;
 import java.util.Queue;
 
 import com.ly.sun.core.filterchain.IoFilter.NextFilter;
-import com.ly.sun.transport.socket.nio.NioSocketSession;
+import com.ly.sun.core.session.IoSession;
 
 public abstract class AbstractProtocolDecoderOutput implements ProtocolDecoderOutput { 
 	
 	Queue<Object> msgQueue = new LinkedList<Object>();
 	
 	@Override
-	public void flush(NextFilter nextFilter, NioSocketSession session) {
+	public void flush(NextFilter nextFilter, IoSession session) {
 		for(Object msg = msgQueue.poll();msg!=null;msg = msgQueue.poll()){
 			nextFilter.messageReceived(session, msg);
 		}

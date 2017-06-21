@@ -1,5 +1,7 @@
 package com.ly.sun.filter.codec.textline;
 
+import java.nio.charset.Charset;
+
 import com.ly.sun.core.session.IoSession;
 import com.ly.sun.filter.codec.ProtocolCodecFactory;
 import com.ly.sun.filter.codec.ProtocolDecoder;
@@ -15,7 +17,7 @@ public class TextLineProtocolCodecFactory implements ProtocolCodecFactory{
 	
 	@Override
 	public ProtocolDecoder getProtocolDecoder(IoSession session) {
-		return null;
+		return new TextLineDecoder(Charset.defaultCharset());
 	}
 
 }

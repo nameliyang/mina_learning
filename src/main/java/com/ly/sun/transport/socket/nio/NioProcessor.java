@@ -37,6 +37,7 @@ public class NioProcessor {
 			throw new IllegalArgumentException();
 		}
 		this.executor = executor;
+		this.selector = selecor;
 	}
 	
 	public void add(NioSocketSession nioSession) {
@@ -190,6 +191,7 @@ public class NioProcessor {
 			
 			IoFilterChain ioFilterChain = new DefaultIoFilterChain(session);
 			ioFilterChain.addLast(new TextLineFilter("textLineDecoder"));
+			ioFilterChain.addLast(null);
 			ioFilterChain.fireSessionCreated();
 			
 			session.setIoFilterChain(ioFilterChain);

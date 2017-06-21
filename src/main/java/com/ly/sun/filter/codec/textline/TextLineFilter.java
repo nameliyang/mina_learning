@@ -10,10 +10,15 @@ import com.ly.sun.filter.codec.AbstractProtocolDecoderOutput;
 
 public class TextLineFilter extends AbstractIoFilter{
 	
-	TextLineDecoder decoder = new TextLineDecoder(Charset.forName("UTF-8"));
+	TextLineDecoder decoder = new TextLineDecoder();
 	
-	public TextLineFilter(String name) {
+	public TextLineFilter(String name,Charset charset) {
 		super(name);
+		decoder = new TextLineDecoder(charset);
+	}
+	
+	public  TextLineFilter(String name) {
+		this(name, Charset.defaultCharset());
 	}
 	
 	@Override
