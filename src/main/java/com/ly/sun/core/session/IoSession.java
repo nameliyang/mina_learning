@@ -1,5 +1,6 @@
 package com.ly.sun.core.session;
 
+import com.ly.sun.core.filterchain.IoFilterChain;
 import com.ly.sun.core.service.IoHandler;
 
 public interface IoSession {
@@ -12,4 +13,7 @@ public interface IoSession {
 	public void setAttributeIfAbsent(Object key,Object value);
 	
 	IoHandler getHandler();
+	
+	IoFilterChain getIoFilterChain();
+	
 }
