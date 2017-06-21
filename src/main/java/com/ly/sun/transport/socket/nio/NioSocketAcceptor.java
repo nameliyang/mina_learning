@@ -11,7 +11,9 @@ import java.nio.channels.spi.SelectorProvider;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
+import java.util.Queue;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicReference;
@@ -27,9 +29,10 @@ public final class NioSocketAcceptor {
 	SelectorProvider selectorProvider = null;
 	
 	Selector selector ; 
+	
 	private boolean reuseAddress = false;
 	
-	SocketAddress localAddress;
+	Queue<SocketAddress> localAddresses = new ConcurrentLinkedQueue<SocketAddress>();
 	
 	private AtomicReference<Acceptor> acceptorRef = new AtomicReference<Acceptor>();
 		
@@ -47,6 +50,7 @@ public final class NioSocketAcceptor {
 	
 	public NioSocketAcceptor(ExecutorService service) throws IOException{
 		this.service = service;
+		 processor = new NioProcessor(service);
 		init();
 	}
 	
@@ -109,7 +113,7 @@ public final class NioSocketAcceptor {
 	}
 	
 	public void bind(SocketAddress localAddress){
-		this.localAddress = localAddress;
+		localAddresses.add(localAddress);
 		startupAcceptor();
 	}
 	
@@ -187,14 +191,19 @@ public final class NioSocketAcceptor {
 	}
 
 	private int registerHandlers() throws Exception{
+		
+		int bounds = 0;
 		try{
-			ServerSocketChannel serverChannel = open(localAddress);
-			boundHandlers.put(serverChannel.getLocalAddress(), serverChannel);
+			for(SocketAddress localAddress = localAddresses.poll();localAddress !=  null;localAddress = localAddresses.poll()){
+				ServerSocketChannel serverChannel = open(localAddress);
+				boundHandlers.put(serverChannel.getLocalAddress(), serverChannel);
+				bounds++;
+			}
 		}catch(Exception e){
 			e.printStackTrace();
-			return 0;
+		}finally{
 		}
-		return 1;
+		return bounds;
 	}
 	
 	public int select() throws IOException{
@@ -232,6 +241,10 @@ public final class NioSocketAcceptor {
 			return nextKey;
 		}
 		
+		@Override
+		public void remove() {
+			iterator.remove();
+		}
 	}
 	
 }

@@ -8,7 +8,7 @@ public class NioSocketAcceptorTest {
 		
 		NioSocketAcceptor acceptor = new NioSocketAcceptor();
 	
-		acceptor.bind(new InetSocketAddress(8080));
+		acceptor.bind(new InetSocketAddress(1234));
 		
 	}
 }
