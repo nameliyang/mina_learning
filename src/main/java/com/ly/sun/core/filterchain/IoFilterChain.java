@@ -1,10 +1,10 @@
 package com.ly.sun.core.filterchain;
 
-import com.ly.sun.transport.socket.nio.NioSocketSession;
+import com.ly.sun.core.session.IoSession;
 
 public interface IoFilterChain {
 	
-	NioSocketSession getSession();
+	IoSession getSession();
 	
 	void addFirst( IoFilter filter);
 	

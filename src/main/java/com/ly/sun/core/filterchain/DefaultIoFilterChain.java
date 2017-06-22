@@ -7,14 +7,14 @@ import com.ly.sun.transport.socket.nio.NioSocketSession;
 
 public class DefaultIoFilterChain implements IoFilterChain {
 	
-	private NioSocketSession session;
+	private IoSession session;
 	
 	private IoFilter header ;
 	
 	private IoFilter tailer ;
 	
 	
-	public   DefaultIoFilterChain(NioSocketSession session) {
+	public   DefaultIoFilterChain(IoSession session) {
 		this.session = session;
 		header = new HeaderFilter();
 		tailer = new TailerFilter();
@@ -24,7 +24,7 @@ public class DefaultIoFilterChain implements IoFilterChain {
 	}
 	
 	@Override
-	public NioSocketSession getSession() {
+	public IoSession getSession() {
 		return session;
 	}
 
@@ -77,6 +77,7 @@ public class DefaultIoFilterChain implements IoFilterChain {
 		public void sessionCreated(NextFilter nextFilter, IoSession session) {
 			System.out.println("session created...");
 		}
+		
 		@Override
 		public void messageReceived(NextFilter nextFilter, IoSession session,
 				Object msg) {

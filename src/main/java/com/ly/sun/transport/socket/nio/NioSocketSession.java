@@ -39,11 +39,14 @@ public class NioSocketSession implements IoSession {
 	public NioProcessor getProcessor(){
 		return this.processor;
 	}
-
+	
+	@Override
 	public SocketChannel getChannel() {
 		return socketChannel;
 	}
-
+	
+	
+	@Override
 	public void setSelectionKey(SelectionKey selectKey) {
 		this.selectKey = selectKey;
 	}
@@ -51,7 +54,8 @@ public class NioSocketSession implements IoSession {
 	public SelectionKey getSelectionKey(){
 		return selectKey;
 	}
-
+	
+	@Override
 	public void setIoFilterChain(IoFilterChain ioFilterChain) {
 		this.ioFilterChain = ioFilterChain;
 	}
@@ -74,8 +78,14 @@ public class NioSocketSession implements IoSession {
 	public void setAttributeIfAbsent(Object key,Object value){
 		  attributes.putIfAbsent(key, value);
 	}
+	
+	@Override
+	public void setIoHandler(IoHandler ioHandler) {
+		this.ioHandler = ioHandler;
+	}
+	
+	
 	class SessionConfigImpl extends AbstractIoSessionConfig{
-		
 	}
 	
 	

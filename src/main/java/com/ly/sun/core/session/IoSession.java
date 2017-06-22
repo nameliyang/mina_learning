@@ -1,5 +1,8 @@
 package com.ly.sun.core.session;
 
+import java.nio.channels.SelectionKey;
+import java.nio.channels.SocketChannel;
+
 import com.ly.sun.core.filterchain.IoFilterChain;
 import com.ly.sun.core.service.IoHandler;
 
@@ -15,5 +18,13 @@ public interface IoSession {
 	IoHandler getHandler();
 	
 	IoFilterChain getIoFilterChain();
+
+	SocketChannel getChannel();
+
+	void setSelectionKey(SelectionKey register);
+
+	void setIoFilterChain(IoFilterChain ioFilterChain);
+
+	void setIoHandler(IoHandler handler);
 	
 }

@@ -2,6 +2,7 @@ package com.ly.sun.filter.codec;
 
 import com.ly.sun.core.buffer.IoBuffer;
 import com.ly.sun.core.filterchain.AbstractIoFilter;
+import com.ly.sun.core.filterchain.IoFilter.NextFilter;
 import com.ly.sun.core.session.IoSession;
 
 public class ProtocolCodecFilter extends AbstractIoFilter{
@@ -13,11 +14,11 @@ public class ProtocolCodecFilter extends AbstractIoFilter{
 		this.factory = factory;
 	}
 	
-	@Override
-	public void sessionCreated(NextFilter nextFilter, IoSession session) {
-		super.sessionCreated(nextFilter, session);
-	}
-	
+//	@Override
+//	public void sessionCreated(NextFilter nextFilter, IoSession session) {
+//		super.sessionCreated(nextFilter, session);
+//	}
+//	
 	
 	@Override
 	public void messageReceived(NextFilter nextFilter, IoSession session, Object msg) {
@@ -32,6 +33,9 @@ public class ProtocolCodecFilter extends AbstractIoFilter{
 	}
 
 	private ProtocolDecoderOutput getDecoderOutput(IoSession session) {
-		return null;
+		
+		return new AbstractProtocolDecoderOutput() {
+		};
+			
 	}
 }

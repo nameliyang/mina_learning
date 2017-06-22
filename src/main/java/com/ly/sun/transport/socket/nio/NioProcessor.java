@@ -14,8 +14,10 @@ import java.util.concurrent.atomic.AtomicReference;
 import com.ly.sun.core.buffer.IoBuffer;
 import com.ly.sun.core.filterchain.DefaultIoFilterChain;
 import com.ly.sun.core.filterchain.IoFilterChain;
+import com.ly.sun.core.session.IoSession;
 import com.ly.sun.core.session.IoSessionConfig;
-import com.ly.sun.filter.codec.textline.TextLineFilter;
+import com.ly.sun.filter.codec.ProtocolCodecFilter;
+import com.ly.sun.filter.codec.textline.TextLineProtocolCodecFactory;
 import com.ly.sun.util.NamePerservingRunnable;
 
 public class NioProcessor {
@@ -28,8 +30,10 @@ public class NioProcessor {
 	
 	Selector selector ;
 	
-	public NioProcessor(Executor executor) throws IOException{
+	NioSocketAcceptor nioSocketAcceptor;
+	public NioProcessor(Executor executor, NioSocketAcceptor nioSocketAcceptor) throws IOException{
 		this(executor,Selector.open());
+		this.nioSocketAcceptor = nioSocketAcceptor;
 	}
 	
 	public NioProcessor(Executor executor,Selector selecor){
@@ -184,17 +188,17 @@ public class NioProcessor {
 		return addedSessions;
 	}
 
-	private boolean addNow(NioSocketSession session) {
+	private boolean addNow(IoSession session) {
 		boolean registered = false;
 		try{
 			init(session);
-			
 			IoFilterChain ioFilterChain = new DefaultIoFilterChain(session);
-			ioFilterChain.addLast(new TextLineFilter("textLineDecoder"));
-			ioFilterChain.addLast(null);
-			ioFilterChain.fireSessionCreated();
+		//	ioFilterChain.addLast(new TextLineFilter("textLineDecoder"));
+			ioFilterChain.addLast(new ProtocolCodecFilter("textLineFilter", new TextLineProtocolCodecFactory("GBK")));
 			
+			ioFilterChain.fireSessionCreated();
 			session.setIoFilterChain(ioFilterChain);
+			session.setIoHandler(nioSocketAcceptor.getHandler());
 			registered = true;
 		}catch(Exception e){
 			e.printStackTrace();
@@ -202,7 +206,7 @@ public class NioProcessor {
 		return registered;
 	}
 
-	private void init(NioSocketSession session) throws IOException {
+	private void init(IoSession session) throws IOException {
 		SocketChannel channel = session.getChannel();
 		channel.configureBlocking(false);
 		session.setSelectionKey(channel.register(selector, SelectionKey.OP_READ,session));

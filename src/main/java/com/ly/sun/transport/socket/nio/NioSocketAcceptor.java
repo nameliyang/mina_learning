@@ -50,13 +50,12 @@ public final class NioSocketAcceptor {
 	
 	public NioSocketAcceptor(ExecutorService service) throws IOException{
 		this.service = service;
-		 processor = new NioProcessor(service);
+		 processor = new NioProcessor(service,this);
 		init();
 	}
 	
 	public NioSocketAcceptor() throws IOException{
 		this(DEFAULT_SERVICE);
-		processor = new NioProcessor(service);
 	}
 	
 	public void setHandler(IoHandler ioHandler){

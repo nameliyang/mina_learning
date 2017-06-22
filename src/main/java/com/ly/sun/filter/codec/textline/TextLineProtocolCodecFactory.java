@@ -8,6 +8,11 @@ import com.ly.sun.filter.codec.ProtocolDecoder;
 import com.ly.sun.filter.codec.ProtocolEncoder;
 
 public class TextLineProtocolCodecFactory implements ProtocolCodecFactory{
+	private Charset charset;
+	
+	public TextLineProtocolCodecFactory(String charset) {
+		this.charset = Charset.forName(charset);
+	}
 
 	@Override
 	public ProtocolEncoder getProtocolEncoder(IoSession session) {
@@ -17,7 +22,7 @@ public class TextLineProtocolCodecFactory implements ProtocolCodecFactory{
 	
 	@Override
 	public ProtocolDecoder getProtocolDecoder(IoSession session) {
-		return new TextLineDecoder(Charset.defaultCharset());
+		return new TextLineDecoder(charset);
 	}
 
 }
