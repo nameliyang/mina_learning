@@ -3,7 +3,6 @@ package com.ly.sun.core.filterchain;
 import com.ly.sun.core.filterchain.IoFilter.NextFilter;
 import com.ly.sun.core.service.IoHandler;
 import com.ly.sun.core.session.IoSession;
-import com.ly.sun.transport.socket.nio.NioSocketSession;
 
 public class DefaultIoFilterChain implements IoFilterChain {
 	
@@ -12,7 +11,6 @@ public class DefaultIoFilterChain implements IoFilterChain {
 	private IoFilter header ;
 	
 	private IoFilter tailer ;
-	
 	
 	public   DefaultIoFilterChain(IoSession session) {
 		this.session = session;
@@ -29,7 +27,7 @@ public class DefaultIoFilterChain implements IoFilterChain {
 	}
 
 	@Override
-	public void addFirst(  IoFilter filter) {
+	public void addFirst(IoFilter filter) {
 		
 	}
 
@@ -73,6 +71,7 @@ public class DefaultIoFilterChain implements IoFilterChain {
 		public TailerFilter(){
 			super("tailFilter");
 		}
+		
 		@Override
 		public void sessionCreated(NextFilter nextFilter, IoSession session) {
 			System.out.println("session created...");

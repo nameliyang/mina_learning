@@ -1,7 +1,6 @@
 package com.ly.sun.core.filterchain;
 
 import com.ly.sun.core.session.IoSession;
-import com.ly.sun.transport.socket.nio.NioSocketSession;
 
 public abstract  class  IoFilter {
 	
