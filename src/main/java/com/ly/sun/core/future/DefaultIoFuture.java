@@ -15,7 +15,7 @@ public class DefaultIoFuture implements IoFuture{
 	
 	private static final Long DEFAULT_TIME_OUT = 1000L;
 	
-	private Object value;
+	private  volatile Object value;
 	
 	@Override
 	public boolean isDone() {
@@ -28,6 +28,10 @@ public class DefaultIoFuture implements IoFuture{
 		synchronized (lock) {
 			lock.notifyAll();	
 		}
+	}
+	
+	public Object getValue(){
+		return value;
 	}
 	
 	
@@ -43,27 +47,58 @@ public class DefaultIoFuture implements IoFuture{
 
 	@Override
 	public boolean await(long timeout) throws InterruptedException {
+		return wait0(timeout,true);
+	}
+
+	private boolean wait0(long timeout,boolean isInterrupt) throws InterruptedException {
 		synchronized (lock) {
+			long endTime = System.currentTimeMillis() + timeout;
+			logger.debug("end time={}",endTime);
 			while(!ready){
-				
+				timeout = Math.min(timeout, DEFAULT_TIME_OUT);
+				logger.debug("wait timeout={}",timeout);
+				try{
+					lock.wait(timeout);
+				}catch(InterruptedException e){
+					if(isInterrupt){
+						throw e;
+					}
+				}
+				logger.debug("leave timeout time={}",System.currentTimeMillis());
+				if(System.currentTimeMillis() >= endTime || ready){
+					break;
+				}
 			}
+			return ready;
 		}
-		return false;
 	}
 
 	@Override
 	public boolean await(long timeout, TimeUnit timeunit)
 			throws InterruptedException {
-		return false;
+		return await(timeunit.toMillis(timeout));
 	}
 
 	@Override
 	public IoFuture awaitUninterruptibly() {
-		return null;
+		synchronized (lock) {
+			while(!ready){
+				try {
+					lock.wait(DEFAULT_TIME_OUT);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+			}
+			return this;
+		}
 	}
 
 	@Override
 	public boolean awaitUninterruptibly(long timeoutMillis) {
+		try {
+			return wait0(timeoutMillis,false);
+		} catch (InterruptedException e) {
+		}
 		return false;
 	}
 
