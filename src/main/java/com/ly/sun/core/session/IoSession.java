@@ -4,6 +4,7 @@ import java.nio.channels.SelectionKey;
 import java.nio.channels.SocketChannel;
 
 import com.ly.sun.core.filterchain.IoFilterChain;
+import com.ly.sun.core.future.WriteFuture;
 import com.ly.sun.core.service.IoHandler;
 
 public interface IoSession {
@@ -26,5 +27,7 @@ public interface IoSession {
 	void setIoFilterChain(IoFilterChain ioFilterChain);
 
 	void setIoHandler(IoHandler handler);
+	 
+	WriteFuture write(Object msg);
 	
 }

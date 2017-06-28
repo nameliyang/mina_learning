@@ -5,6 +5,8 @@ import java.nio.channels.SocketChannel;
 import java.util.concurrent.ConcurrentHashMap;
 
 import com.ly.sun.core.filterchain.IoFilterChain;
+import com.ly.sun.core.future.DefaultWriteFuture;
+import com.ly.sun.core.future.WriteFuture;
 import com.ly.sun.core.service.IoHandler;
 import com.ly.sun.core.session.AbstractIoSessionConfig;
 import com.ly.sun.core.session.IoSession;
@@ -97,5 +99,11 @@ public class NioSocketSession implements IoSession {
 	@Override
 	public IoFilterChain getIoFilterChain() {
 		return ioFilterChain;
+	}
+
+	@Override
+	public WriteFuture write(Object msg) {
+		WriteFuture writeFuture = new DefaultWriteFuture();
+		return writeFuture;
 	}
 }
