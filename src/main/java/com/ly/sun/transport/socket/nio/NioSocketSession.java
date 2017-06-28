@@ -2,7 +2,9 @@ package com.ly.sun.transport.socket.nio;
 
 import java.nio.channels.SelectionKey;
 import java.nio.channels.SocketChannel;
+import java.util.Queue;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 import com.ly.sun.core.filterchain.IoFilterChain;
 import com.ly.sun.core.future.DefaultWriteFuture;
@@ -11,6 +13,8 @@ import com.ly.sun.core.service.IoHandler;
 import com.ly.sun.core.session.AbstractIoSessionConfig;
 import com.ly.sun.core.session.IoSession;
 import com.ly.sun.core.session.IoSessionConfig;
+import com.ly.sun.core.write.DefaultWriteRequest;
+import com.ly.sun.core.write.WriteRequest;
 
 public class NioSocketSession implements IoSession {
 	
@@ -27,6 +31,8 @@ public class NioSocketSession implements IoSession {
 	private  IoSessionConfig sessionConfig = new SessionConfigImpl();
 	
 	private ConcurrentHashMap<Object, Object> attributes = new ConcurrentHashMap<Object, Object>();	
+	
+	private Queue<WriteRequest> writeRequest = new ConcurrentLinkedQueue<WriteRequest>();
 	
 	IoHandler ioHandler;
 	
@@ -104,6 +110,14 @@ public class NioSocketSession implements IoSession {
 	@Override
 	public WriteFuture write(Object msg) {
 		WriteFuture writeFuture = new DefaultWriteFuture();
+		WriteRequest writeRequest = new DefaultWriteRequest(writeFuture, msg);
+		this.getIoFilterChain().fireMessageWrite(writeRequest);
 		return writeFuture;
+	}
+	
+	@Override
+	public Queue<WriteRequest> getWriteRequest() {
+		
+		return writeRequest;
 	}
 }

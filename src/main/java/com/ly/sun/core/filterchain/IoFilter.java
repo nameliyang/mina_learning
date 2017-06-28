@@ -1,6 +1,7 @@
 package com.ly.sun.core.filterchain;
 
 import com.ly.sun.core.session.IoSession;
+import com.ly.sun.core.write.WriteRequest;
 
 public abstract  class  IoFilter {
 	
@@ -28,6 +29,13 @@ public abstract  class  IoFilter {
 			NextFilter nextFilter = IoFilter.this.nextIoFilter.nextFilter;
 			nextIoFilter.messageReceived(nextFilter, session,msg);
 		}
+
+		@Override
+		public void messageWrite(IoSession session, WriteRequest writeRequest) {
+			IoFilter nextIoFilter = IoFilter.this.nextIoFilter;
+			NextFilter nextFilter = IoFilter.this.nextIoFilter.nextFilter;
+			nextIoFilter.messageWrite(nextFilter, session,writeRequest);
+		}
 	};
 	
 	public  abstract void init() throws Exception;
@@ -38,11 +46,16 @@ public abstract  class  IoFilter {
 	
 	public abstract  void messageReceived(NextFilter nextFilter,IoSession session,Object msg);
 	
+	public abstract void messageWrite(NextFilter nextFilter,IoSession session,WriteRequest writeRequest);
+	
 	public interface NextFilter{
 		
 		void sessionCreated(IoSession session);
 		
 		void messageReceived(IoSession session,Object msg);
+		
+		void messageWrite(IoSession session,WriteRequest writeRequest);
+		
 	}
 
 }

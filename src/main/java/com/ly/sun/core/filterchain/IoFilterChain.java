@@ -1,6 +1,7 @@
 package com.ly.sun.core.filterchain;
 
 import com.ly.sun.core.session.IoSession;
+import com.ly.sun.core.write.WriteRequest;
 
 public interface IoFilterChain {
 	
@@ -13,5 +14,7 @@ public interface IoFilterChain {
 	void fireSessionCreated();
 	
 	void fireMessageReceived(Object message);
+
+	void fireMessageWrite(WriteRequest writeRequest);
 	
 }

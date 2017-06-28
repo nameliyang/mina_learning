@@ -3,6 +3,7 @@ package com.ly.sun.core.filterchain;
 import com.ly.sun.core.filterchain.IoFilter.NextFilter;
 import com.ly.sun.core.service.IoHandler;
 import com.ly.sun.core.session.IoSession;
+import com.ly.sun.core.write.WriteRequest;
 
 public class DefaultIoFilterChain implements IoFilterChain {
 	
@@ -47,6 +48,11 @@ public class DefaultIoFilterChain implements IoFilterChain {
 		header.sessionCreated(nextFilter, session);
 	}
 	
+	@Override
+	public void fireMessageWrite(WriteRequest writeRequest) {
+		NextFilter nextFilter = tailer.nextFilter;
+		header.sessionCreated(nextFilter, session);
+	}
 
 	@Override
 	public void fireMessageReceived(Object message) {
@@ -63,6 +69,15 @@ public class DefaultIoFilterChain implements IoFilterChain {
 			System.out.println("header filter...before");
 			nextFilter.sessionCreated(session);
 			System.out.println("header filter...after");
+		}
+		@Override
+		public void messageWrite(NextFilter nextFilter, IoSession session,
+				WriteRequest writeRequest) {
+			Object message = writeRequest.getMessage();
+			if(message  instanceof String){
+				session.getWriteRequest().offer(writeRequest);
+			}
+			throw new RuntimeException("");
 		}
 	}
 	
@@ -88,6 +103,7 @@ public class DefaultIoFilterChain implements IoFilterChain {
 			}
 		}
 	}
+
 
 	
 }

@@ -1,6 +1,8 @@
 package com.ly.sun;
 
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.net.InetSocketAddress;
 
 import org.slf4j.Logger;
@@ -12,9 +14,18 @@ import com.ly.sun.transport.socket.nio.NioSocketAcceptor;
 
 public class Test {
 	public static void main(String[] args) throws IOException {
-		NioSocketAcceptor acceptor = new NioSocketAcceptor();
+		char c = '李';
+		String binaryString = Integer.toBinaryString(c);
+		System.out.println(binaryString);
+		System.out.println(Integer.toHexString(c));
+		OutputStream os = new FileOutputStream("D:/test.txt");
+		os.write(c&0xff);
+		os.write(c>>8);
+		os.flush();
+		os.close();
+		/*NioSocketAcceptor acceptor = new NioSocketAcceptor();
 		acceptor.setHandler(new MyIoHandler());
-		acceptor.bind(new InetSocketAddress(1234));
+		acceptor.bind(new InetSocketAddress(1234));*/
 	}
 	
 }
