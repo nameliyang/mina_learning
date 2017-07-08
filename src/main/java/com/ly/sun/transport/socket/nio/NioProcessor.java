@@ -11,6 +11,9 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.Executor;
 import java.util.concurrent.atomic.AtomicReference;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.ly.sun.core.buffer.IoBuffer;
 import com.ly.sun.core.filterchain.DefaultIoFilterChain;
 import com.ly.sun.core.filterchain.IoFilterChain;
@@ -21,6 +24,8 @@ import com.ly.sun.filter.codec.textline.TextLineProtocolCodecFactory;
 import com.ly.sun.util.NamePerservingRunnable;
 
 public class NioProcessor {
+	
+	private static final Logger logger = LoggerFactory.getLogger(NioProcessor.class);
 	
 	private static final Queue<NioSocketSession> newSessions = new ConcurrentLinkedQueue<NioSocketSession>();
 	
@@ -77,9 +82,8 @@ public class NioProcessor {
 					if(select >0){
 						process();
 					}
-					
 				} catch (IOException e) {
-					e.printStackTrace();
+					logger.error("", e);
 				}
 				
 			}
@@ -101,6 +105,7 @@ public class NioProcessor {
 	
 	
 	public void process(NioSocketSession session) {
+		
 		if(isReadable(session)){
 			read(session);
 		}
@@ -143,8 +148,8 @@ public class NioProcessor {
 	}
 
 	private boolean isWritable(NioSocketSession session) {
-		
-		return false;
+		SelectionKey key = session.getSelectionKey();
+		return key.isValid() && key.isWritable();
 	}
 
 	private boolean isReadable(NioSocketSession session) {
