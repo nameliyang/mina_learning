@@ -83,4 +83,6 @@ public abstract class IoBuffer {
 	public String toString() {
 		return buf().toString();
 	}
+
+	public abstract IoBuffer compact(); 
 }

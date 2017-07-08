@@ -244,4 +244,9 @@ public abstract class AbstractIoBuffer extends IoBuffer {
 		buf().clear();
 		return this;
 	}
+	@Override
+	public IoBuffer compact() {
+		buf().compact();
+		return this;
+	}
 }
