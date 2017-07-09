@@ -40,8 +40,18 @@ public class SimpleNioServerTest {
 				while(buffer.hasRemaining()){
 					sb.append((char)buffer.get());
 				}
-				logger.info("read msg={}",sb.toString());
-				session.dowrite(sb.toString());
+				String readMessage = sb.toString();
+				if("exit".equals(readMessage)){
+					try {
+						session.close();
+					} catch (IOException e) {
+						logger.error("",e);
+					}
+				}
+				logger.info("read msg={}",readMessage);
+				String rtnMsg = sb.toString().toUpperCase();
+				session.dowrite(rtnMsg);
+				
 			}
 		});
 		
@@ -87,7 +97,6 @@ class SelectServer{
 	
 	class Acceptor implements Runnable{
 		
-		Queue<MyIoSession> flushSessions = new ConcurrentLinkedQueue<SelectServer.MyIoSession>();
 		
 		@Override
 		public void run() {
@@ -103,9 +112,7 @@ class SelectServer{
 							handler(key);
 						}
 					}
-					for(MyIoSession session = flushSessions.poll();session!=null&&session.scheduledWrite;session = flushSessions.poll()){
-						session.flush();
-					}
+					
 				} catch (IOException e) {
 					logger.error("",e);
 				}
@@ -120,12 +127,18 @@ class SelectServer{
 				socketChannel.register(selector, SelectionKey.OP_READ,new MyIoSession(key,socketChannel));
 			}else if(key.isReadable()){
 				SocketChannel socketChannel = (SocketChannel) key.channel();
-				MyIoSession session = (MyIoSession) key.attachment();
+				MyIoSession session = getSession(key);
 				session.doread();
+			}else if(key.isWritable()){
+				MyIoSession session = getSession(key);
 				session.flush();
 			}
 		}
 		
+		public MyIoSession getSession(SelectionKey key){
+			MyIoSession session = (MyIoSession) key.attachment();
+			return session;
+		}
 	}
 	
 	  class MyIoSession{
@@ -150,9 +163,28 @@ class SelectServer{
 		}
 
 
-		public void flush() throws IOException {
+		public void close() throws IOException {
+			key.cancel();
+			socketChannel.close();
+		}
+
+
+		/*public void flush(Acceptor acceptor) throws IOException {
 			 socketChannel.write(writeBuffer.buf());
 			 writeBuffer.compact();
+			 if(writeBuffer.hasRemaining()){
+				 this.scheduledWrite  = true;
+			 }
+		}*/
+
+
+		public void flush() throws IOException {
+			SocketChannel socketChannel = this.socketChannel;
+			socketChannel.write(writeBuffer.buf());
+			if(!writeBuffer.hasRemaining()){
+				key.interestOps(key.interestOps()&~SelectionKey.OP_WRITE);
+			}
+			
 		}
 
 
@@ -160,12 +192,14 @@ class SelectServer{
 			if(message instanceof String){
 				IoBuffer buffer = IoBuffer.wrap(ByteBuffer.wrap(((String) message).getBytes()));
 				writeBuffer.put(buffer);
+				scheduledWrite = true;
 			}
 		}
 
 		public void doread() throws IOException {
 			int readCount = 0;
 			int read;
+			
 			while((read= readBuffer()) > 0){
 				readCount += read;
 				if(!ioBuffer.hasRemaining()){
@@ -209,6 +243,20 @@ class SelectServer{
 					ioHandler.messageReceived(this,ioBuffer);
 				}
 			}
+			
+			if(scheduledWrite){
+				 writeBuffer.flip();
+				 socketChannel.write(writeBuffer.buf());
+				 if(writeBuffer.hasRemaining()){
+					 this.scheduledWrite  = true;
+					 socketChannel.register(selector, SelectionKey.OP_WRITE);
+				 }else{
+					 scheduledWrite = false;
+				 }
+				 writeBuffer.compact();
+			}
+			
+			
 		}
 		
 		

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.text.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.shape.*?>
+<?import java.lang.*?>
+<?import javafx.scene.layout.*?>
+
+<Pane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="445.0" prefWidth="614.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.ly.sun.gui.MyController">
+   <children>
+      <TextArea fx:id="sendTextArea" layoutX="40.0" layoutY="14.0" onKeyPressed="#onKeyPressed" prefHeight="200.0" prefWidth="336.0" />
+      <TextArea layoutX="40.0" layoutY="223.0" prefHeight="200.0" prefWidth="336.0" />
+      <Button layoutX="448.0" layoutY="147.0" mnemonicParsing="false" text="send" />
+      <Button layoutX="543.0" layoutY="147.0" mnemonicParsing="false" text="send" />
+      <Label layoutX="411.0" layoutY="35.0" text="IP:" />
+      <TextField layoutX="448.0" layoutY="30.0" prefHeight="29.0" prefWidth="150.0" />
+      <Label layoutX="395.0" layoutY="85.0" text="port:" />
+      <TextField layoutX="448.0" layoutY="80.0" prefHeight="29.0" prefWidth="150.0" />
+      <Button layoutX="449.0" layoutY="375.0" mnemonicParsing="false" text="read" />
+   </children>
+</Pane>
