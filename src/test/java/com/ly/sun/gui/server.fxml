@@ -6,16 +6,22 @@
 <?import java.lang.*?>
 <?import javafx.scene.layout.*?>
 
-<Pane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="445.0" prefWidth="614.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.ly.sun.gui.MyController">
+<Pane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="461.0" prefWidth="918.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.ly.sun.gui.MyController">
    <children>
-      <TextArea fx:id="sendTextArea" layoutX="40.0" layoutY="14.0" onKeyPressed="#onKeyPressed" prefHeight="200.0" prefWidth="336.0" />
-      <TextArea layoutX="40.0" layoutY="223.0" prefHeight="200.0" prefWidth="336.0" />
-      <Button layoutX="448.0" layoutY="147.0" mnemonicParsing="false" text="send" />
-      <Button layoutX="543.0" layoutY="147.0" mnemonicParsing="false" text="send" />
+      <TextArea fx:id="sendTextArea" layoutX="40.0" layoutY="14.0" prefHeight="200.0" prefWidth="336.0" />
+      <TextArea fx:id="reciveArea" layoutX="40.0" layoutY="223.0" prefHeight="200.0" prefWidth="336.0" />
+      <Button layoutX="530.0" layoutY="122.0" mnemonicParsing="false" onAction="#send" prefHeight="35.0" prefWidth="68.0" text="send" />
       <Label layoutX="411.0" layoutY="35.0" text="IP:" />
-      <TextField layoutX="448.0" layoutY="30.0" prefHeight="29.0" prefWidth="150.0" />
+      <TextField fx:id="ipField" layoutX="448.0" layoutY="30.0" prefHeight="29.0" prefWidth="150.0" text="127.0.0.1" />
       <Label layoutX="395.0" layoutY="85.0" text="port:" />
-      <TextField layoutX="448.0" layoutY="80.0" prefHeight="29.0" prefWidth="150.0" />
-      <Button layoutX="449.0" layoutY="375.0" mnemonicParsing="false" text="read" />
+      <TextField fx:id="portField" layoutX="448.0" layoutY="80.0" prefHeight="29.0" prefWidth="150.0" text="23" />
+      <Button layoutX="530.0" layoutY="166.0" mnemonicParsing="false" onAction="#doread" prefHeight="29.0" prefWidth="68.0" text="read" />
+      <Button fx:id="connBtn" layoutX="652.0" layoutY="30.0" mnemonicParsing="false" onMouseClicked="#onConnect" prefHeight="29.0" prefWidth="82.0" text="connect" />
+      <Button fx:id="disConn" layoutX="804.0" layoutY="30.0" mnemonicParsing="false" onMouseClicked="#onDisConnect" prefHeight="29.0" prefWidth="68.0" text="discon" />
+      <Separator layoutX="376.0" layoutY="195.0" prefHeight="19.0" prefWidth="520.0" />
+      <Label layoutX="390.0" layoutY="130.0" text="writeBuf" />
+      <Label layoutX="392.0" layoutY="171.0" text="readBuf" />
+      <TextField fx:id="writeBufField" layoutX="464.0" layoutY="125.0" prefHeight="29.0" prefWidth="49.0" text="1" />
+      <TextField fx:id="readBufField" layoutX="464.0" layoutY="166.0" prefHeight="29.0" prefWidth="49.0" text="1" />
    </children>
 </Pane>
