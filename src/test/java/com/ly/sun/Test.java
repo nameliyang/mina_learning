@@ -1,7 +1,10 @@
 package com.ly.sun;
 
 import java.io.IOException;
-import java.nio.ByteBuffer;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.ServerSocket;
+import java.net.Socket;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,12 +15,14 @@ import com.ly.sun.core.session.IoSession;
 public class Test {
 	public static void main(String[] args) throws IOException {
 		
-		ByteBuffer byteBuffer = ByteBuffer.allocate(10);
-		byteBuffer.put((byte) '2');
-		byteBuffer.put((byte)'a');
-		byteBuffer.flip();// limit = position; posotion = 0;
+	
 		
-		byteBuffer.compact(); //
+//		ByteBuffer byteBuffer = ByteBuffer.allocate(10);
+//		byteBuffer.put((byte) '2');
+//		byteBuffer.put((byte)'a');
+//		byteBuffer.flip();// limit = position; posotion = 0;
+//		
+//		byteBuffer.compact(); //
 		
 //		char c = '李';
 //		String binaryString = Integer.toBinaryString(c);
