@@ -7,27 +7,39 @@ import java.net.ServerSocket;
 import java.net.Socket;
 
 public class SimpleServer {
-	public static void main(String[] args) throws IOException {
+	int port;
+	ServerSocket serverSocket = null;
+
+	public SimpleServer(int port) throws IOException {
+		this.port = port;
+		serverSocket = new ServerSocket(port);
+	}
+
+	public void startListener() {
 		
-		ServerSocket serverSocket = new ServerSocket(23);
-		while(true){
-			Socket socket = serverSocket.accept();
-			try{
+		while (true) {
+			Socket socket  = null;
+			try {
+				socket = serverSocket.accept();
 				InputStream inputStream = socket.getInputStream();
 				OutputStream outputStream = socket.getOutputStream();
 				int read = 0;
-				while((read = inputStream.read())!=-1){
+				while ((read = inputStream.read()) != -1) {
 					outputStream.write(read);
 				}
-			}catch(Exception e){
-				e.printStackTrace();
-			}
-			finally{
-				if(socket != null){
-					socket.close();
+			} catch (Exception e) {
+				// e.printStackTrace();
+			} finally {
+				if (socket != null) {
+					try {
+						socket.close();
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
 				}
 			}
-			
+
 		}
 	}
+
 }
