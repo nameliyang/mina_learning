@@ -12,6 +12,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javafx.application.Platform;
+//github.com/nameliyang/mina_learning.git
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -95,9 +96,7 @@ public class MyController implements Initializable{
 	}
 	
 	private static final Object lock = new Object();
-	
 	boolean readFlag = false;
-	
 	@FXML
 	public void doread(ActionEvent event){
 		synchronized (lock) {
@@ -108,7 +107,6 @@ public class MyController implements Initializable{
 	}
 	
 	Thread thread = null;
-	
 	@Override
 	public void initialize(URL location, ResourceBundle resources) {
 		new Thread(){
