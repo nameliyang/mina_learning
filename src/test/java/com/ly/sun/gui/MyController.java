@@ -2,14 +2,13 @@ package com.ly.sun.gui;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
+import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.URL;
 import java.net.UnknownHostException;
+import java.nio.ByteBuffer;
+import java.nio.channels.SocketChannel;
 import java.util.ResourceBundle;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javafx.application.Platform;
 //github.com/nameliyang/mina_learning.git
@@ -19,6 +18,9 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class MyController implements Initializable{
 	
@@ -52,14 +54,19 @@ public class MyController implements Initializable{
 	
 	byte[] msgBuffer ;
 	
-	
+	SocketChannel socketChannel = null;
 	@FXML
 	public void onConnect() throws UnknownHostException, IOException{
 		String ipStr = ipField.getText();
 		int port = Integer.parseInt(portField.getText());
 		socket = new Socket(ipStr, port);
 		logger.info("connect {}:{}",ipStr,port);
-		thread.start();
+		socketChannel = SocketChannel.open();
+		socketChannel.configureBlocking(false);
+		socketChannel.connect(new InetSocketAddress("127.0.0.1", 23));
+		// block wait connnect...
+		socketChannel.finishConnect();
+	//	thread.start();
 	}
 	
 	
@@ -72,38 +79,78 @@ public class MyController implements Initializable{
 	}
 	int index = 0;
 	
+	ByteBuffer buffer = null;
+		
 	@FXML
 	public void send(ActionEvent event) throws IOException{
-		if(msgBuffer == null){
-			msgBuffer = sendTextArea.getText().getBytes();
+		if(buffer == null){
+			String content = sendTextArea.getText();
+			buffer = ByteBuffer.wrap(content.getBytes());
 		}
-		int bufferSize = Integer.parseInt(writeBufField.getText());
-		OutputStream outputStream = socket.getOutputStream();
+		if(!buffer.hasRemaining()){
+			logger.info("buffer has no remainging ...");
+			return ;
+		}
+		int pos = buffer.position();
+		int limit = buffer.limit();
+		int expectWriteBytes = Integer.parseInt(writeBufField.getText());
+		boolean overFlow = (pos + expectWriteBytes-1 >= buffer.limit());
+		if(overFlow && !buffer.hasRemaining()){
+			return ;
+		}
+		int writeBytes = 0;
+		if(overFlow){
+			writeBytes = socketChannel.write(buffer);
+			logger.info("overflow writeBytes ={}",writeBytes);
+		}else{
+			try{
+				buffer.limit(pos+ expectWriteBytes);
+				writeBytes  = socketChannel.write(buffer);
+				logger.info("writebytes = {}",writeBytes);
+			}finally{
+				buffer.limit(limit);
+			}
+		}
 		
-		if(index + bufferSize -1 >= msgBuffer.length ){
-			bufferSize = msgBuffer.length -1  - index +1;
-			logger.info("buffersize = {}",bufferSize);
-		}
-		if(bufferSize == 0){
-			logger.info("end send server...");
-			return;
-		}
-		logger.info("do write msgBuffer index = {},bufferSize={}",index,bufferSize);
-		outputStream.write(msgBuffer,index,bufferSize);
-		logger.info("send msg ={}",new String(msgBuffer,index,bufferSize));
-		index = index+bufferSize;
-		outputStream.flush();
+//		if(msgBuffer == null){
+//			msgBuffer = sendTextArea.getText().getBytes();
+//		}
+//		int bufferSize = Integer.parseInt(writeBufField.getText());
+//		OutputStream outputStream = socket.getOutputStream();
+//		
+//		if(index + bufferSize -1 >= msgBuffer.length ){
+//			bufferSize = msgBuffer.length -1  - index +1;
+//			logger.info("buffersize = {}",bufferSize);
+//		}
+//		if(bufferSize == 0){
+//			logger.info("end send server...");
+//			return;
+//		}
+//		logger.info("do write msgBuffer index = {},bufferSize={}",index,bufferSize);
+//		outputStream.write(msgBuffer,index,bufferSize);
+//		logger.info("send msg ={}",new String(msgBuffer,index,bufferSize));
+//		index = index+bufferSize;
+//		outputStream.flush();
 	}
 	
 	private static final Object lock = new Object();
 	boolean readFlag = false;
 	@FXML
-	public void doread(ActionEvent event){
-		synchronized (lock) {
-			readFlag  = true;
-			logger.info("set readflag = true and notify wait thread");
-			lock.notify();
+	public void doread(ActionEvent event) throws IOException{
+		ByteBuffer buffer  = ByteBuffer.allocate(Integer.parseInt(readBufField.getText()));
+		int read = socketChannel.read(buffer);
+		if(read > 0){
+			buffer.flip();
+			while(buffer.hasRemaining()){
+				byte b = buffer.get();
+				reciveArea.appendText(String.valueOf(b));
+			}
 		}
+//		synchronized (lock) {
+//			readFlag  = true;
+//			logger.info("set readflag = true and notify wait thread");
+//			lock.notify();
+//		}
 	}
 	
 	Thread thread = null;

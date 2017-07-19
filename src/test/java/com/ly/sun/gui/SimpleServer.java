@@ -25,6 +25,7 @@ public class SimpleServer {
 				OutputStream outputStream = socket.getOutputStream();
 				int read = 0;
 				while ((read = inputStream.read()) != -1) {
+					System.out.print((char)read);
 					outputStream.write(read);
 				}
 			} catch (Exception e) {
@@ -40,6 +41,11 @@ public class SimpleServer {
 			}
 
 		}
+	}
+	
+	public static void main(String[] args) throws IOException {
+		SimpleServer server = new SimpleServer(23);
+		server.startListener();
 	}
 
 }
