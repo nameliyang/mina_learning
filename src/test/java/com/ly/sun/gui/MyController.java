@@ -143,7 +143,7 @@ public class MyController implements Initializable{
 			buffer.flip();
 			while(buffer.hasRemaining()){
 				byte b = buffer.get();
-				reciveArea.appendText(String.valueOf(b));
+				reciveArea.appendText(String.valueOf((char)b));
 			}
 		}
 //		synchronized (lock) {
@@ -159,7 +159,7 @@ public class MyController implements Initializable{
 		new Thread(){
 			public void run() {
 				try {
-					SimpleServer server = new SimpleServer(23);
+					SingleEchoServer server = new SingleEchoServer(23);
 					logger.info("start simple listener server");
 					server.startListener();
 				} catch (IOException e) {
