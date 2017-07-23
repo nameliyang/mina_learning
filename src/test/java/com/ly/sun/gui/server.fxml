@@ -23,5 +23,6 @@
       <Label layoutX="392.0" layoutY="171.0" text="readBuf" />
       <TextField fx:id="writeBufField" layoutX="464.0" layoutY="125.0" prefHeight="29.0" prefWidth="49.0" text="1" />
       <TextField fx:id="readBufField" layoutX="464.0" layoutY="166.0" prefHeight="29.0" prefWidth="49.0" text="1" />
+      <Button layoutX="625.0" layoutY="125.0" mnemonicParsing="false" onAction="#nopSend" text="nopsend" />
    </children>
 </Pane>

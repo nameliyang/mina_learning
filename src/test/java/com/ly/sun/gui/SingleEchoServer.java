@@ -6,10 +6,13 @@ import java.io.OutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class SingleEchoServer {
 	int port;
 	ServerSocket serverSocket = null;
-
+	private static final Logger logger = LoggerFactory.getLogger(SingleEchoServer.class);
 	public SingleEchoServer(int port) throws IOException {
 		this.port = port;
 		serverSocket = new ServerSocket(port);
@@ -29,7 +32,7 @@ public class SingleEchoServer {
 							OutputStream outputStream = socket.getOutputStream();
 							int read = 0;
 							while ((read = inputStream.read()) != -1) {
-								System.out.print((char)read);
+								logger.info("server read char ={}",(char)read+"");
 								outputStream.write(read);
 							}
 						} catch (IOException e) {

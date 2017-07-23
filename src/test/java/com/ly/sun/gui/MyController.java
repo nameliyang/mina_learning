@@ -80,7 +80,17 @@ public class MyController implements Initializable{
 	int index = 0;
 	
 	ByteBuffer buffer = null;
-		
+	
+	
+	@FXML
+	public void nopSend() throws IOException{
+		String content =  writeBufField.getText();
+		ByteBuffer buffer = ByteBuffer.wrap(new byte[Integer.parseInt(content)]);
+		int writeBytes = socketChannel.write(buffer);
+		logger.info("nopper write {} bytes",writeBytes);
+	}
+	
+	
 	@FXML
 	public void send(ActionEvent event) throws IOException{
 		if(buffer == null){
@@ -141,9 +151,10 @@ public class MyController implements Initializable{
 		int read = socketChannel.read(buffer);
 		if(read > 0){
 			buffer.flip();
-			while(buffer.hasRemaining()){
+			if(buffer.hasRemaining()){
 				byte b = buffer.get();
-				reciveArea.appendText(String.valueOf((char)b));
+				reciveArea.appendText(String.valueOf(b));
+				logger.info("do read = {}",String.valueOf(b));
 			}
 		}
 //		synchronized (lock) {
@@ -153,10 +164,12 @@ public class MyController implements Initializable{
 //		}
 	}
 	
+	
+	
 	Thread thread = null;
 	@Override
 	public void initialize(URL location, ResourceBundle resources) {
-		new Thread(){
+		Thread listenerThread = new Thread(){
 			public void run() {
 				try {
 					SingleEchoServer server = new SingleEchoServer(23);
@@ -166,7 +179,10 @@ public class MyController implements Initializable{
 					e.printStackTrace();
 				}
 			};
-		}.start();
+		};
+		
+		listenerThread.setDaemon(true);
+		listenerThread.start();
 		
 		thread = new Thread(){
 			@Override
