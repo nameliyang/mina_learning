@@ -12,7 +12,7 @@ public class ClientGui extends Application {
 
 	@Override
 	public void start(Stage stage) throws Exception {
-		URL resource = getClass().getResource("server.fxml");
+		URL resource = getClass().getResource("client.fxml");
 		Parent root = FXMLLoader.load(resource);
 		Scene scene = new Scene(root);
 		stage.setTitle("FXML Welcome");
