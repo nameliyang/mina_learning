@@ -6,6 +6,12 @@ import org.slf4j.LoggerFactory;
 public class Test {
 	private static final Logger logger = LoggerFactory.getLogger(SimpleNioServerTest.class);
 	public static void main(String[] args) {
-		logger.info("helloworld");
+		System.out.println(compute(10));
+	}
+	public static int compute(int num){
+		if(num ==1){
+			return 1;
+		}
+		return num * compute(num-1);
 	}
 }
