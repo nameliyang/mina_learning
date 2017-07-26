@@ -18,52 +18,70 @@ public class SimpleAsynServer implements Runnable {
 	boolean interrupt;
 
 	IoProcessor ioProcessor;
-
+	
+	IoHandler ioHandler;
+	
 	public SimpleAsynServer() throws IOException {
 		selecor = Selector.open();
 		ioProcessor = new IoProcessor(selecor);
 	}
-
+	public void setIoHandler(IoHandler ioHandler){
+		this.ioHandler = ioHandler;
+	}
 	public SimpleAsynServer bind(int port) throws IOException {
 		this.port = port;
 		ServerSocketChannel serverSocketChannel = ServerSocketChannel.open();
 		serverSocketChannel.configureBlocking(false);
-		serverSocketChannel.bind(new InetSocketAddress(port));
+		serverSocketChannel.socket().bind(new InetSocketAddress(port));
 		serverSocketChannel.register(selecor, SelectionKey.OP_ACCEPT);
 		return this;
 	}
 
 	@Override
 	public void run() {
-		while (interrupt) {
-			Set<SelectionKey> selectedKeys = selecor.selectedKeys();
-			Iterator<SelectionKey> iterator = selectedKeys.iterator();
-			while (iterator.hasNext()) {
-				SelectionKey key = iterator.next();
-				iterator.remove();
-				if(!key.isValid()){
-					continue;
-				}
-				if(key.isAcceptable()){
-					try {
-						ServerSocketChannel  serverSocketChannel = (ServerSocketChannel) key.channel();
-						SocketChannel socketChannel = serverSocketChannel.accept();
-						socketChannel.configureBlocking(false);
-						NioSession session = new NioSession(socketChannel,key);
-						session.registerReadEvent(selecor);
-					} catch (IOException e) {
-						e.printStackTrace();
+		while (!interrupt) {
+			try{
+				selecor.select();
+				Set<SelectionKey> selectedKeys = selecor.selectedKeys();
+				Iterator<SelectionKey> iterator = selectedKeys.iterator();
+				while (iterator.hasNext()) {
+					SelectionKey key = iterator.next();
+					iterator.remove();
+					if(!key.isValid()){
+						continue;
 					}
-				}else{
-					NioSession session = (NioSession) key.attachment();
-					ioProcessor.process(session);
+					if(key.isAcceptable()){
+						try {
+							ServerSocketChannel  serverSocketChannel = (ServerSocketChannel) key.channel();
+							SocketChannel socketChannel = serverSocketChannel.accept();
+							socketChannel.configureBlocking(false);
+							NioSession session = new NioSession(socketChannel,key);
+							session.setIoHandler(ioHandler);
+							session.registerReadEvent(selecor);
+						} catch (IOException e) {
+							e.printStackTrace();
+						}
+					}else{
+						NioSession session = (NioSession) key.attachment();
+						ioProcessor.process(session);
+					}
+					
 				}
-				
+			}catch(Exception e){
+				e.printStackTrace();
 			}
+			
 		}
-
 	}
-
-	public static void main(String[] args) {
+	public void start(){
+		new Thread(this).start();
+	}
+	
+	public static void main(String[] args) throws IOException {
+		
+		SimpleAsynServer server = new SimpleAsynServer();
+		
+		server.bind(8080).start();
+		
 	}
 }

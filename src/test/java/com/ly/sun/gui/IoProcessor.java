@@ -19,7 +19,6 @@ public class IoProcessor {
 		
 	}
 
-	
 	class Task implements Runnable{
 		
 		NioSession session;
@@ -30,13 +29,16 @@ public class IoProcessor {
 
 		@Override
 		public void run() {
-			
-			if(session.isReadable()){
+			try{
+				if(session.isReadable()){
+					session.read();
+				}
 				
-			}
-			
-			if(session.isWriteable()){
-				
+				if(session.isWriteable()){
+					
+				}
+			}catch(Exception e){
+				e.printStackTrace();
 			}
 		}
 		
