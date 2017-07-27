@@ -14,7 +14,8 @@ public class NioSession {
 	
 	SelectionKey selectionKey;
 
-
+	IoProcessor ioProcessor;
+	
 	private IoHandler ioHandler;
 	
 	private  final static int BUFFER_SIZE = Integer.parseInt(System.getProperty("BUFFER_SIZE", "1024"));
@@ -25,14 +26,18 @@ public class NioSession {
 	
 	private static final AtomicLong sessionGenerate = new AtomicLong();
 	
-	public NioSession(SocketChannel socketChannel, SelectionKey key) {
+	public NioSession(IoProcessor ioProcessor, SocketChannel socketChannel ) {
+		this.ioProcessor = ioProcessor;
 		this.socketChannel = socketChannel;
-		this.selectionKey = key;
 		sessionId = sessionGenerate.incrementAndGet(); 
 	}
 
-	public void registerReadEvent(Selector selecor) throws ClosedChannelException {
-		socketChannel.register(selecor, SelectionKey.OP_READ,this);
+	public void registerReadEvent(Selector selecor)   {
+		  try {
+			selectionKey = socketChannel.register(selecor, SelectionKey.OP_READ,this);
+		} catch (ClosedChannelException e) {
+			e.printStackTrace();
+		}
 	}
 
 	public boolean isReadable() {
@@ -61,6 +66,10 @@ public class NioSession {
 
 	public Long getSessionId() {
 		return sessionId;
+	}
+	
+	public IoProcessor getProcessor(){
+		return this.ioProcessor;
 	}
 	
 }

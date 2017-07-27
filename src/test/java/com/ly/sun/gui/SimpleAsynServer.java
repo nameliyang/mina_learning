@@ -17,17 +17,19 @@ public class SimpleAsynServer implements Runnable {
 
 	boolean interrupt;
 
-	IoProcessor ioProcessor;
+    IoProcessor ioProcessor;
 	
 	IoHandler ioHandler;
 	
 	public SimpleAsynServer() throws IOException {
 		selecor = Selector.open();
-		ioProcessor = new IoProcessor(selecor);
+		ioProcessor = new IoProcessor();
 	}
+	
 	public void setIoHandler(IoHandler ioHandler){
 		this.ioHandler = ioHandler;
 	}
+	
 	public SimpleAsynServer bind(int port) throws IOException {
 		this.port = port;
 		ServerSocketChannel serverSocketChannel = ServerSocketChannel.open();
@@ -55,15 +57,13 @@ public class SimpleAsynServer implements Runnable {
 							ServerSocketChannel  serverSocketChannel = (ServerSocketChannel) key.channel();
 							SocketChannel socketChannel = serverSocketChannel.accept();
 							socketChannel.configureBlocking(false);
-							NioSession session = new NioSession(socketChannel,key);
+							NioSession session = new NioSession(ioProcessor,socketChannel);
 							session.setIoHandler(ioHandler);
-							session.registerReadEvent(selecor);
+						//	session.registerReadEvent(selecor);
+							session.getProcessor().addAcceptorSession(session);
 						} catch (IOException e) {
 							e.printStackTrace();
 						}
-					}else{
-						NioSession session = (NioSession) key.attachment();
-						ioProcessor.process(session);
 					}
 					
 				}
@@ -80,7 +80,7 @@ public class SimpleAsynServer implements Runnable {
 	public static void main(String[] args) throws IOException {
 		
 		SimpleAsynServer server = new SimpleAsynServer();
-		
+		server.setIoHandler(new IoHandler());
 		server.bind(8080).start();
 		
 	}
