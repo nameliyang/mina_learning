@@ -22,6 +22,8 @@ public class NioSession {
 	
 	ByteBuffer buffer = ByteBuffer.allocate(BUFFER_SIZE);
 	
+	ByteBuffer currentWriteBuffer = ByteBuffer.allocate(BUFFER_SIZE);
+	
 	private Long sessionId ;
 	
 	private static final AtomicLong sessionGenerate = new AtomicLong();
@@ -54,6 +56,21 @@ public class NioSession {
 			buffer.flip();
 			ioHandler.onReadData(this,buffer);
 		}
+	}
+	
+	public void write(Object msg) throws IOException {
+		if(msg  instanceof String) {
+		}else if(msg instanceof ByteBuffer){
+			ByteBuffer bufMsg = (ByteBuffer) msg;
+			if(bufMsg.remaining() ==0 ){
+				throw new RuntimeException("null msg");
+			}
+			int write = socketChannel.write(bufMsg);
+			if(bufMsg.hasRemaining()){
+				currentWriteBuffer = bufMsg.compact();
+			}
+		}
+		throw new RuntimeException("unsupportDataType exception");
 	}
 	
 	public void readBufferRelese(){

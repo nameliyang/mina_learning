@@ -46,6 +46,7 @@ public class IoProcessor {
 				}
 				
 				if(session.isWriteable()){
+					
 				}
 			}catch(Exception e){
 				e.printStackTrace();
@@ -56,12 +57,12 @@ public class IoProcessor {
 
 	public void addAcceptorSession(NioSession session) {
 		acceptorSessions.add(session);
-		
 		if(accepotr.compareAndSet(null, new Acceptor())){
 			servicePool.submit(accepotr.get());
 		}
-		
 	}
+	
+	
 	class Acceptor implements Runnable{
 
 		@Override
