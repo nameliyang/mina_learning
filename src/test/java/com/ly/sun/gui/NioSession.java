@@ -6,6 +6,9 @@ import java.nio.channels.ClosedChannelException;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.nio.channels.SocketChannel;
+import java.util.Queue;
+import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
 
 public class NioSession {
@@ -27,6 +30,10 @@ public class NioSession {
 	private Long sessionId ;
 	
 	private static final AtomicLong sessionGenerate = new AtomicLong();
+	
+	private Queue<Object> writeMsgs = new ConcurrentLinkedQueue<Object>();
+	
+	private static final AtomicBoolean scheduleForflush = new AtomicBoolean();
 	
 	public NioSession(IoProcessor ioProcessor, SocketChannel socketChannel ) {
 		this.ioProcessor = ioProcessor;
@@ -58,17 +65,31 @@ public class NioSession {
 		}
 	}
 	
+	public void registerWrite(boolean regiserWrite){
+		if(regiserWrite){
+			selectionKey.interestOps(selectionKey.interestOps()&~SelectionKey.OP_WRITE);
+		}else{
+			selectionKey.interestOps(selectionKey.interestOps()&SelectionKey.OP_WRITE);
+		}
+	}
+	
+	
+	
 	public void write(Object msg) throws IOException {
 		if(msg  instanceof String) {
 		}else if(msg instanceof ByteBuffer){
-			ByteBuffer bufMsg = (ByteBuffer) msg;
-			if(bufMsg.remaining() ==0 ){
-				throw new RuntimeException("null msg");
+			writeMsgs.add(msg);
+			if(scheduleForflush.compareAndSet(false, true)){
+				this.getProcessor().addFlushSession(this);
 			}
-			int write = socketChannel.write(bufMsg);
-			if(bufMsg.hasRemaining()){
-				currentWriteBuffer = bufMsg.compact();
-			}
+//			ByteBuffer bufMsg = (ByteBuffer) msg;
+//			if(bufMsg.remaining() ==0 ){
+//				throw new RuntimeException("null msg");
+//			}
+//			int write = socketChannel.write(bufMsg);
+//			if(bufMsg.hasRemaining()){
+//				currentWriteBuffer = bufMsg.compact();
+//			}
 		}
 		throw new RuntimeException("unsupportDataType exception");
 	}
@@ -88,5 +109,13 @@ public class NioSession {
 	public IoProcessor getProcessor(){
 		return this.ioProcessor;
 	}
+
+	public Queue<Object> getMessageQueue() {
+		return writeMsgs;
+	}
 	
+	
+	public SocketChannel getSocketChannel(){
+		return this.socketChannel;
+	}
 }

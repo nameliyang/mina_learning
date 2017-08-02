@@ -1,7 +1,7 @@
 package com.ly.sun.gui;
 
 import java.io.IOException;
-import java.nio.channels.ClosedChannelException;
+import java.nio.ByteBuffer;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.util.Iterator;
@@ -22,12 +22,23 @@ public class IoProcessor {
 	
 	private static final AtomicReference<Acceptor> accepotr = new AtomicReference<Acceptor>();
 	
+	private static final Queue<NioSession> flushSessions = new ConcurrentLinkedQueue<NioSession>();
+	
+	
 	public IoProcessor( ) throws IOException {
 		selector = Selector.open();
 	}
 
-	public void process(NioSession session) throws ClosedChannelException {
-		servicePool.submit(new Task(session));
+	public void process(NioSession session) throws IOException {
+		
+		if(session.isReadable()){
+			session.read();
+		}
+		
+		if(session.isWriteable()){
+			session.getProcessor().addFlushSession(session);
+		}
+	//	servicePool.submit(new Task(session));
 	}
 
 	class Task implements Runnable{
@@ -41,13 +52,7 @@ public class IoProcessor {
 		@Override
 		public void run() {
 			try{
-				if(session.isReadable()){
-					session.read();
-				}
 				
-				if(session.isWriteable()){
-					
-				}
 			}catch(Exception e){
 				e.printStackTrace();
 			}
@@ -62,6 +67,9 @@ public class IoProcessor {
 		}
 	}
 	
+	public void addFlushSession(NioSession session){
+		flushSessions.add(session);
+	}
 	
 	class Acceptor implements Runnable{
 
@@ -81,12 +89,38 @@ public class IoProcessor {
 							nioSession.getProcessor().process(nioSession);
 						}
 					}
+					flush();
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
 			}
 		}
 
+		private void flush() {
+			for(NioSession session = flushSessions.poll();session!=null;session = flushSessions.poll()){
+				flush(session);
+			}
+		}
+
+		private void flush(NioSession session) {
+			Queue<Object> messageQueue = session.getMessageQueue();
+			
+			for(Object writeMsg  = messageQueue.peek(); writeMsg!= null ; writeMsg = messageQueue.peek()){
+				ByteBuffer writeBuffer = (ByteBuffer) writeMsg;
+				try {
+					session.registerWrite(false);
+					session.getSocketChannel().write(writeBuffer);
+					if(writeBuffer.hasRemaining()){
+						session.registerWrite(true);
+						return;
+					}
+					messageQueue.remove();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+		
 		private void registerSelector() {
 			for (NioSession session = acceptorSessions.poll(); session != null; session = acceptorSessions
 					.poll()) {
