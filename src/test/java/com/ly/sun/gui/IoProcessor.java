@@ -1,6 +1,7 @@
 package com.ly.sun.gui;
 
 import java.io.IOException;
+import java.nio.ByteBuffer;
 import java.nio.channels.ClosedChannelException;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
@@ -21,6 +22,9 @@ public class IoProcessor {
 	private static final Queue<NioSession> acceptorSessions = new ConcurrentLinkedQueue<NioSession>();
 	
 	private static final AtomicReference<Acceptor> accepotr = new AtomicReference<Acceptor>();
+	
+	private static final Queue<NioSession> flushSessions = new ConcurrentLinkedQueue<NioSession>();
+	
 	
 	public IoProcessor( ) throws IOException {
 		selector = Selector.open();
@@ -81,12 +85,40 @@ public class IoProcessor {
 							nioSession.getProcessor().process(nioSession);
 						}
 					}
+					flush();
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
 			}
 		}
 
+		private void flush() {
+			
+			for(NioSession session = flushSessions.poll();session!=null;session = flushSessions.poll()){
+				flush(session);
+			}
+		}
+
+		private void flush(NioSession session) {
+			Queue<Object> messageQueue = session.getMessageQueue();
+			
+			for(Object writeMsg  = messageQueue.poll();writeMsg!= null;writeMsg = messageQueue.poll()){
+				ByteBuffer writeBuffer = (ByteBuffer) writeMsg;
+				try {
+					session.getSocketChannel().write(writeBuffer);
+					if(writeBuffer.hasRemaining()){
+						return;
+					}
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+		
+		public void addFlushSession(NioSession session){
+			flushSessions.add(session);
+		}
+		
 		private void registerSelector() {
 			for (NioSession session = acceptorSessions.poll(); session != null; session = acceptorSessions
 					.poll()) {
