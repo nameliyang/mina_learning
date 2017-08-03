@@ -1,12 +1,6 @@
 	package com.ly.sun;
 	
 	import java.io.IOException;
-import java.net.InetSocketAddress;
-import java.nio.channels.SelectionKey;
-import java.nio.channels.Selector;
-import java.nio.channels.SocketChannel;
-import java.util.Iterator;
-import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,26 +10,29 @@ import com.ly.sun.core.session.IoSession;
 	
 	public class Test {
 		public static void main(String[] args) throws IOException, InterruptedException {
-			SocketChannel socketChannel = SocketChannel.open();
-			socketChannel.configureBlocking(false);
-			Selector selector = Selector.open();
-			socketChannel.register(selector, SelectionKey.OP_CONNECT);
-			socketChannel.connect(new InetSocketAddress("127.0.0.1", 23));
-			
-			while(true){
-				int select = selector.select();
-				if(select >0){
-					Set<SelectionKey> selectedKeys = selector.selectedKeys();
-					Iterator<SelectionKey> iterator = selectedKeys.iterator();
-					while(iterator.hasNext()){
-						SelectionKey key = iterator.next();
-						iterator.remove();
-						if(key.isConnectable()){
-							System.out.println("key is connectablel ...");
-						}
-					}
-				}
-			}
+			Long l1 = 128L;
+			Long l2 = 128L;
+			System.out.println(String.class=="123".getClass());
+//			SocketChannel socketChannel = SocketChannel.open();
+//			socketChannel.configureBlocking(false);
+//			Selector selector = Selector.open();
+//			socketChannel.register(selector, SelectionKey.OP_CONNECT);
+//			socketChannel.connect(new InetSocketAddress("127.0.0.1", 23));
+//			
+//			while(true){
+//				int select = selector.select();
+//				if(select >0){
+//					Set<SelectionKey> selectedKeys = selector.selectedKeys();
+//					Iterator<SelectionKey> iterator = selectedKeys.iterator();
+//					while(iterator.hasNext()){
+//						SelectionKey key = iterator.next();
+//						iterator.remove();
+//						if(key.isConnectable()){
+//							System.out.println("key is connectablel ...");
+//						}
+//					}
+//				}
+//			}
 	//		ByteBuffer byteBuffer = ByteBuffer.allocate(10);
 	//		byteBuffer.put((byte) '2');
 	//		byteBuffer.put((byte)'a');

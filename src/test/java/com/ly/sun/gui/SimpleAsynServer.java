@@ -21,9 +21,9 @@ public class SimpleAsynServer implements Runnable {
 	
 	IoHandler ioHandler;
 	
-	public SimpleAsynServer() throws IOException {
+	public SimpleAsynServer(int processorCount) throws IOException {
 		selecor = Selector.open();
-		ioProcessor = new IoProcessor();
+		ioProcessor = new IoProcessor(processorCount);
 	}
 	
 	public void setIoHandler(IoHandler ioHandler){
@@ -79,7 +79,7 @@ public class SimpleAsynServer implements Runnable {
 	
 	public static void main(String[] args) throws IOException {
 		
-		SimpleAsynServer server = new SimpleAsynServer();
+		SimpleAsynServer server = new SimpleAsynServer(1);
 		server.setIoHandler(new IoHandler());
 		server.bind(8080).start();
 		

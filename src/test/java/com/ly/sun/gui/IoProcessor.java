@@ -24,12 +24,24 @@ public class IoProcessor {
 	private static final AtomicReference<Acceptor> accepotr = new AtomicReference<Acceptor>();
 	
 	private static final Queue<NioSession> flushSessions = new ConcurrentLinkedQueue<NioSession>();
-	
+
+	private static final int DEFAULT_IOPROCESSOR = 1;
+
+	private IoProcessor[] ioProcessors ;
 	
 	public IoProcessor( ) throws IOException {
-		selector = Selector.open();
+		this(DEFAULT_IOPROCESSOR);
 	}
-
+	
+	public IoProcessor(int processorCount) throws IOException {
+		selector = Selector.open();
+		ioProcessors = new IoProcessor[processorCount];
+	}
+	
+	public IoProcessor[] getIoProcessors(){
+		return ioProcessors;
+	}
+	
 	public void process(NioSession session) throws ClosedChannelException {
 		servicePool.submit(new Task(session));
 	}

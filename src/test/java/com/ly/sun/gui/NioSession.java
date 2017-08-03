@@ -40,7 +40,8 @@ public class NioSession {
 		this.socketChannel = socketChannel;
 		sessionId = sessionGenerate.incrementAndGet(); 
 	}
-
+	
+	
 	public void registerReadEvent(Selector selecor)   {
 		  try {
 			selectionKey = socketChannel.register(selecor, SelectionKey.OP_READ,this);
@@ -99,6 +100,9 @@ public class NioSession {
 	}
 	
 	public IoProcessor getProcessor(){
+		Long sessionId = getSessionId();
+		IoProcessor[] ioProcessors = ioProcessor.getIoProcessors();
+		IoProcessor ioProcessor = ioProcessors[(int)(sessionId%ioProcessors.length)];
 		return this.ioProcessor;
 	}
 
