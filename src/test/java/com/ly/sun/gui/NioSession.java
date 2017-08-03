@@ -66,14 +66,22 @@ public class NioSession {
 		}
 	}
 	
+	public void registerWrite(boolean regiserWrite){
+		if(regiserWrite){
+			selectionKey.interestOps(selectionKey.interestOps()&~SelectionKey.OP_WRITE);
+		}else{
+			selectionKey.interestOps(selectionKey.interestOps()&SelectionKey.OP_WRITE);
+		}
+	}
+	
+	
+	
 	public void write(Object msg) throws IOException {
 		if(msg  instanceof String) {
 		}else if(msg instanceof ByteBuffer){
-			
 			writeMsgs.add(msg);
-			
 			if(scheduleForflush.compareAndSet(false, true)){
-				this.getProcessor().addAcceptorSession(this);
+				this.getProcessor().addFlushSession(this);
 			}
 //			ByteBuffer bufMsg = (ByteBuffer) msg;
 //			if(bufMsg.remaining() ==0 ){

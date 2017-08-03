@@ -2,7 +2,6 @@ package com.ly.sun.gui;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
-import java.nio.channels.ClosedChannelException;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.util.Iterator;
@@ -29,6 +28,7 @@ public class IoProcessor {
 
 	private IoProcessor[] ioProcessors ;
 	
+	
 	public IoProcessor( ) throws IOException {
 		this(DEFAULT_IOPROCESSOR);
 	}
@@ -42,7 +42,7 @@ public class IoProcessor {
 		return ioProcessors;
 	}
 	
-	public void process(NioSession session) throws ClosedChannelException {
+	public void process(NioSession session)  {
 		servicePool.submit(new Task(session));
 	}
 
@@ -57,13 +57,7 @@ public class IoProcessor {
 		@Override
 		public void run() {
 			try{
-				if(session.isReadable()){
-					session.read();
-				}
 				
-				if(session.isWriteable()){
-					
-				}
 			}catch(Exception e){
 				e.printStackTrace();
 			}
@@ -78,6 +72,9 @@ public class IoProcessor {
 		}
 	}
 	
+	public void addFlushSession(NioSession session){
+		flushSessions.add(session);
+	}
 	
 	class Acceptor implements Runnable{
 
@@ -105,7 +102,6 @@ public class IoProcessor {
 		}
 
 		private void flush() {
-			
 			for(NioSession session = flushSessions.poll();session!=null;session = flushSessions.poll()){
 				flush(session);
 			}
@@ -114,21 +110,20 @@ public class IoProcessor {
 		private void flush(NioSession session) {
 			Queue<Object> messageQueue = session.getMessageQueue();
 			
-			for(Object writeMsg  = messageQueue.poll();writeMsg!= null;writeMsg = messageQueue.poll()){
+			for(Object writeMsg  = messageQueue.peek(); writeMsg!= null ; writeMsg = messageQueue.peek()){
 				ByteBuffer writeBuffer = (ByteBuffer) writeMsg;
 				try {
+					session.registerWrite(false);
 					session.getSocketChannel().write(writeBuffer);
 					if(writeBuffer.hasRemaining()){
+						session.registerWrite(true);
 						return;
 					}
+					messageQueue.remove();
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
 			}
-		}
-		
-		public void addFlushSession(NioSession session){
-			flushSessions.add(session);
 		}
 		
 		private void registerSelector() {
