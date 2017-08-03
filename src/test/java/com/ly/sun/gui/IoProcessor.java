@@ -2,6 +2,7 @@ package com.ly.sun.gui;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
+//github.com/nameliyang/mina_learning.git
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.util.Iterator;
@@ -23,6 +24,7 @@ public class IoProcessor {
 	private static final AtomicReference<Acceptor> accepotr = new AtomicReference<Acceptor>();
 	
 	private static final Queue<NioSession> flushSessions = new ConcurrentLinkedQueue<NioSession>();
+	
 	
 	
 	public IoProcessor( ) throws IOException {
