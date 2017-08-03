@@ -10,7 +10,6 @@ import java.util.Iterator;
 import java.util.Set;
 
 public class SimpleAsynServer implements Runnable {
-
 	int port;
 
 	Selector selecor;

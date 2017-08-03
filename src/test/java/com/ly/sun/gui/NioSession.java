@@ -66,14 +66,24 @@ public class NioSession {
 		}
 	}
 	
+	public void registerWrite(boolean regiserWrite){
+		if(regiserWrite){
+			//注册write事件
+			selectionKey.interestOps(selectionKey.interestOps()|SelectionKey.OP_WRITE);
+		}else{
+			//取
+			selectionKey.interestOps(selectionKey.interestOps()& ~SelectionKey.OP_WRITE);
+		}
+	}
+	
+	
+	
 	public void write(Object msg) throws IOException {
 		if(msg  instanceof String) {
 		}else if(msg instanceof ByteBuffer){
-			
 			writeMsgs.add(msg);
-			
 			if(scheduleForflush.compareAndSet(false, true)){
-				this.getProcessor().addAcceptorSession(this);
+				this.getProcessor().addFlushSession(this);
 			}
 //			ByteBuffer bufMsg = (ByteBuffer) msg;
 //			if(bufMsg.remaining() ==0 ){
@@ -84,7 +94,6 @@ public class NioSession {
 //				currentWriteBuffer = bufMsg.compact();
 //			}
 		}
-		throw new RuntimeException("unsupportDataType exception");
 	}
 	
 	public void readBufferRelese(){
@@ -103,7 +112,7 @@ public class NioSession {
 		Long sessionId = getSessionId();
 		IoProcessor[] ioProcessors = ioProcessor.getIoProcessors();
 		IoProcessor ioProcessor = ioProcessors[(int)(sessionId%ioProcessors.length)];
-		return this.ioProcessor;
+		return ioProcessor;
 	}
 
 	public Queue<Object> getMessageQueue() {

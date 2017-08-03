@@ -1,6 +1,12 @@
 	package com.ly.sun;
 	
 	import java.io.IOException;
+import java.net.InetSocketAddress;
+import java.nio.channels.SelectionKey;
+import java.nio.channels.Selector;
+import java.nio.channels.SocketChannel;
+import java.util.Iterator;
+import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -10,9 +16,9 @@ import com.ly.sun.core.session.IoSession;
 	
 	public class Test {
 		public static void main(String[] args) throws IOException, InterruptedException {
-			Long l1 = 128L;
-			Long l2 = 128L;
-			System.out.println(String.class=="123".getClass());
+			
+			System.out.println(100%1);
+//			
 //			SocketChannel socketChannel = SocketChannel.open();
 //			socketChannel.configureBlocking(false);
 //			Selector selector = Selector.open();
