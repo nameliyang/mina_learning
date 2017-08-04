@@ -17,28 +17,6 @@ import com.ly.sun.core.session.IoSession;
 	public class Test {
 		public static void main(String[] args) throws IOException, InterruptedException {
 			
-			System.out.println(100%1);
-//			
-//			SocketChannel socketChannel = SocketChannel.open();
-//			socketChannel.configureBlocking(false);
-//			Selector selector = Selector.open();
-//			socketChannel.register(selector, SelectionKey.OP_CONNECT);
-//			socketChannel.connect(new InetSocketAddress("127.0.0.1", 23));
-//			
-//			while(true){
-//				int select = selector.select();
-//				if(select >0){
-//					Set<SelectionKey> selectedKeys = selector.selectedKeys();
-//					Iterator<SelectionKey> iterator = selectedKeys.iterator();
-//					while(iterator.hasNext()){
-//						SelectionKey key = iterator.next();
-//						iterator.remove();
-//						if(key.isConnectable()){
-//							System.out.println("key is connectablel ...");
-//						}
-//					}
-//				}
-//			}
 	//		ByteBuffer byteBuffer = ByteBuffer.allocate(10);
 	//		byteBuffer.put((byte) '2');
 	//		byteBuffer.put((byte)'a');
