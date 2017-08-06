@@ -1,4 +1,4 @@
-package com.ly.sun.gui;
+package com.ly.sun.simplenioserver;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -14,7 +14,6 @@ public class IoHandler {
 	StringBuilder sb = new StringBuilder();
 	
 	public void onReadData(NioSession session, ByteBuffer buffer) throws IOException{
-		
 		try{
 			String readStr = readBufferAsString(buffer);
 			logger.info("sessionId = {},read msg={}",session.getSessionId(),readStr);
@@ -25,6 +24,10 @@ public class IoHandler {
 		}finally{
 			buffer.clear();
 		}
+	}
+	
+	public void sessionCreated(NioSession session){
+		logger.info("sessionId = {} created",session.getSessionId());
 	}
 	
 	public String readBufferAsString(ByteBuffer buffer){

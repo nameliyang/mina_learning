@@ -1,4 +1,4 @@
-package com.ly.sun.gui;
+package com.ly.sun.simplenioserver;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -62,7 +62,8 @@ public class NioSession {
 		int read  = socketChannel.read(buffer);
 		if(read > 0){
 			buffer.flip();
-			ioHandler.onReadData(this,buffer);
+		//	ioHandler.onReadData(this,buffer);
+			this.getProcessor().getIoFilterChain().fireMessageReceived(this,buffer);
 		}
 	}
 	
@@ -76,7 +77,9 @@ public class NioSession {
 		}
 	}
 	
-	
+	public void setFlushable(boolean flushable){
+		scheduleForflush.set(flushable);
+	}
 	
 	public void write(Object msg) throws IOException {
 		if(msg  instanceof String) {
@@ -122,5 +125,9 @@ public class NioSession {
 	
 	public SocketChannel getSocketChannel(){
 		return this.socketChannel;
+	}
+	
+	public IoHandler getIoHandler(){
+		return ioHandler;
 	}
 }

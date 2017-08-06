@@ -1,4 +1,4 @@
-package com.ly.sun.gui;
+package com.ly.sun.simplenioserver;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -12,6 +12,11 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicReference;
 
+import org.glassfish.grizzly.filterchain.FilterChain;
+
+import com.ly.sun.simplenioserver.fiterchain.DefaultIoFilterChain;
+import com.ly.sun.simplenioserver.fiterchain.IoFilterChain;
+
 public class IoProcessor {
 	
 	private static final ExecutorService servicePool = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors() + 1);
@@ -23,6 +28,8 @@ public class IoProcessor {
 	private static final AtomicReference<Acceptor> accepotr = new AtomicReference<Acceptor>();
 	
 	private static final Queue<NioSession> flushSessions = new ConcurrentLinkedQueue<NioSession>();
+	
+	private static final IoFilterChain ioFilterChain = new DefaultIoFilterChain();
 
 //	private static final int DEFAULT_IOPROCESSOR = 1;
 	private IoProcessor[] ioProcessors ;
@@ -42,6 +49,11 @@ public class IoProcessor {
 	public IoProcessor[] getIoProcessors(){
 		return ioProcessors;
 	}
+	
+	public IoFilterChain getIoFilterChain(){
+		return  ioFilterChain;
+	}
+	
 	
 	public void process(NioSession session) throws IOException  {
 		if(session.isReadable()){
@@ -94,6 +106,7 @@ public class IoProcessor {
 					if(select > 0){
 						Set<SelectionKey> selectedKeys = selector.selectedKeys();
 						Iterator<SelectionKey> iterator = selectedKeys.iterator();
+						
 						while(iterator.hasNext()){
 							SelectionKey key = iterator.next();
 							iterator.remove();
@@ -115,6 +128,7 @@ public class IoProcessor {
 		}
 
 		private void flush(NioSession session) {
+			session.setFlushable(false);
 			Queue<Object> messageQueue = session.getMessageQueue();
 			for(Object writeMsg  = messageQueue.peek(); writeMsg!= null ; writeMsg = messageQueue.peek()){
 				ByteBuffer writeBuffer = (ByteBuffer) writeMsg;
@@ -136,6 +150,7 @@ public class IoProcessor {
 			for (NioSession session = acceptorSessions.poll(); session != null; session = acceptorSessions
 					.poll()) {
 				session.registerReadEvent(selector);
+				ioFilterChain.fireSessionCreated(session);
 			}
 		}
 		

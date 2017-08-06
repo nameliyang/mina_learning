@@ -1,4 +1,4 @@
-package com.ly.sun.gui;
+package com.ly.sun.simplenioserver;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -9,7 +9,10 @@ import java.nio.channels.SocketChannel;
 import java.util.Iterator;
 import java.util.Set;
 
+import com.ly.sun.simplenioserver.fiterchain.IoFilter;
+
 public class SimpleAsynServer implements Runnable {
+	
 	int port;
 
 	Selector selecor;
@@ -51,6 +54,7 @@ public class SimpleAsynServer implements Runnable {
 					if(!key.isValid()){
 						continue;
 					}
+					
 					if(key.isAcceptable()){
 						try {
 							ServerSocketChannel  serverSocketChannel = (ServerSocketChannel) key.channel();
@@ -58,7 +62,6 @@ public class SimpleAsynServer implements Runnable {
 							socketChannel.configureBlocking(false);
 							NioSession session = new NioSession(ioProcessor,socketChannel);
 							session.setIoHandler(ioHandler);
-						//	session.registerReadEvent(selecor);
 							session.getProcessor().addAcceptorSession(session);
 						} catch (IOException e) {
 							e.printStackTrace();
@@ -72,6 +75,7 @@ public class SimpleAsynServer implements Runnable {
 			
 		}
 	}
+	
 	public void start(){
 		new Thread(this).start();
 	}
@@ -80,7 +84,11 @@ public class SimpleAsynServer implements Runnable {
 		
 		SimpleAsynServer server = new SimpleAsynServer(1);
 		server.setIoHandler(new IoHandler());
+		server.addIoFilter(null);
 		server.bind(8080).start();
-		
+	}
+
+	public  void addIoFilter(IoFilter ioFilter) {
+		ioProcessor.getIoFilterChain().addFilter(ioFilter);
 	}
 }
