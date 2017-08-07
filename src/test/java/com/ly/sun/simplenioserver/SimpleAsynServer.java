@@ -10,6 +10,7 @@ import java.util.Iterator;
 import java.util.Set;
 
 import com.ly.sun.simplenioserver.fiterchain.IoFilter;
+import com.ly.sun.simplenioserver.fiterchain.ProtocolCodecFilter;
 
 public class SimpleAsynServer implements Runnable {
 	
@@ -84,7 +85,7 @@ public class SimpleAsynServer implements Runnable {
 		
 		SimpleAsynServer server = new SimpleAsynServer(1);
 		server.setIoHandler(new IoHandler());
-		server.addIoFilter(null);
+		server.addIoFilter(new ProtocolCodecFilter("protocolFilter"));
 		server.bind(8080).start();
 	}
 

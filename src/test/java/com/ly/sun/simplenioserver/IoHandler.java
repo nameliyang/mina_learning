@@ -11,16 +11,12 @@ import io.netty.buffer.ByteBuf;
 public class IoHandler {
 	private static Logger logger = LoggerFactory.getLogger(IoHandler.class);
 	
-	StringBuilder sb = new StringBuilder();
 	
 	public void onReadData(NioSession session, ByteBuffer buffer) throws IOException{
 		try{
 			String readStr = readBufferAsString(buffer);
 			logger.info("sessionId = {},read msg={}",session.getSessionId(),readStr);
-			sb.append(readStr);
-			if(sb.toString().endsWith("exit")){
-				session.write(ByteBuffer.wrap(sb.toString().getBytes()));
-			}
+			session.write(ByteBuffer.wrap(readStr.toUpperCase().getBytes()));
 		}finally{
 			buffer.clear();
 		}

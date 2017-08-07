@@ -39,6 +39,7 @@ public class DecoderCodec {
 					int tempPos = tempBuffer.position();
 					tempBuffer.position(tempPos-matchCount);
 				}
+				tempBuffer.flip();
 				queue.add(tempBuffer);
 				tempBuffer = ByteBuffer.allocate(byteBuffer.remaining());
 				oldPos = byteBuffer.position();

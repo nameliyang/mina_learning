@@ -1,5 +1,6 @@
 package com.ly.sun.simplenioserver.fiterchain;
 
+import java.io.IOException;
 import java.nio.ByteBuffer;
 
 import com.ly.sun.simplenioserver.NioSession;
@@ -60,9 +61,9 @@ public class DefaultIoFilterChain implements IoFilterChain {
 		
 		@Override
 		public void fireMessageReceived(NextFilter nextFilter, NioSession session,ByteBuffer byteBuffer) {
-			System.out.println("header Filter before...");
+		//	System.out.println("header Filter before...");
 			nextFilter.fireMessageReceived(session, byteBuffer);
-			System.out.println("header filter after...");
+		//	System.out.println("header filter after...");
 		}
 		
 	}
@@ -75,8 +76,13 @@ public class DefaultIoFilterChain implements IoFilterChain {
 		
     	@Override
     	public void fireMessageReceived(NextFilter nextFilter, NioSession session,ByteBuffer byteBuf) {
-    		System.out.println("tailer Filter before...");
-    		System.out.println("tailer Filter after...");
+    		//System.out.println("tailer Filter before...");
+    		try {
+				session.getIoHandler().onReadData(session, byteBuf);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+    		//System.out.println("tailer Filter after...");
     	}
     	
     	@Override
@@ -87,15 +93,24 @@ public class DefaultIoFilterChain implements IoFilterChain {
 
 	public static void main(String[] args) {
 		IoFilterChain ioFilterChain = new DefaultIoFilterChain();
-		ioFilterChain.addFilter(new TestFilter("testFilterA"));
+	//	ioFilterChain.addFilter(new TestFilter("testFilterA"));
 		
 		ioFilterChain.addFilter(new ProtocolCodecFilter("ProtocolFilter"));
 		
 	//	ioFilterChain.addFilter(new TestFilter("testFilterB"));
-		String msg = "hello\r12\r\n123";
-		
-		ioFilterChain.fireMessageReceived(null,ByteBuffer.wrap(msg.getBytes()));		
-		ioFilterChain.fireMessageReceived(null,ByteBuffer.wrap("\r\n".getBytes()));
+		String msg = "hello12\r\n123";
+		ByteBuffer buffer = ByteBuffer.allocate(100);
+		buffer.put(msg.getBytes());
+		buffer.flip();
+		NioSession session = new NioSession(null, null);
+		ioFilterChain.fireMessageReceived(session,buffer);
+		buffer.compact();
+		buffer.put((byte)'\r');
+		buffer.put((byte)'\n');
+		buffer.put("end\r\n".getBytes());
+		buffer.flip();
+		System.out.println(buffer);
+		ioFilterChain.fireMessageReceived(session,buffer);
 	}
 	
 	static class TestFilter extends AbstractIoFilter{

@@ -27,7 +27,7 @@ public class ProtocolCodecFilter extends AbstractIoFilter{
 		Queue<ByteBuffer> queueEncoder = decoder.encode(byteBuffer);
 		
 		for(ByteBuffer buffer = queueEncoder.poll();buffer!=null;buffer = queueEncoder.poll()){
-			logger.info("decoder msg =|{}|",new String(buffer.array(),0,buffer.position()));
+			logger.info("decoder msg =|{}|",new String(buffer.array(),buffer.position(),buffer.remaining()));
 			nextFilter.fireMessageReceived(session, buffer);
 		}
 	}

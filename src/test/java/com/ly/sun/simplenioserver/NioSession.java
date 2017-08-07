@@ -64,6 +64,7 @@ public class NioSession {
 			buffer.flip();
 		//	ioHandler.onReadData(this,buffer);
 			this.getProcessor().getIoFilterChain().fireMessageReceived(this,buffer);
+			buffer.compact();
 		}
 	}
 	
