@@ -88,9 +88,14 @@ public class DefaultIoFilterChain implements IoFilterChain {
 	public static void main(String[] args) {
 		IoFilterChain ioFilterChain = new DefaultIoFilterChain();
 		ioFilterChain.addFilter(new TestFilter("testFilterA"));
-		ioFilterChain.addFilter(new TestFilter("testFilterB"));
-		ioFilterChain.fireMessageReceived(null,null);
 		
+		ioFilterChain.addFilter(new ProtocolCodecFilter("ProtocolFilter"));
+		
+	//	ioFilterChain.addFilter(new TestFilter("testFilterB"));
+		String msg = "hello\r12\r\n123";
+		
+		ioFilterChain.fireMessageReceived(null,ByteBuffer.wrap(msg.getBytes()));		
+		ioFilterChain.fireMessageReceived(null,ByteBuffer.wrap("\r\n".getBytes()));
 	}
 	
 	static class TestFilter extends AbstractIoFilter{

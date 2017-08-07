@@ -12,4 +12,5 @@ public interface IoFilterChain {
 	void fireMessageReceived(NioSession session,ByteBuffer buffer);
 	
 	void fireSessionCreated(NioSession session);
+	
 }
