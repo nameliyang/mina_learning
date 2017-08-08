@@ -11,8 +11,13 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
 
-public class NioSession {
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+
+public class NioSession {
+	private static final Logger  logger =  LoggerFactory.getLogger(NioSession.class);
+	
 	SocketChannel socketChannel;
 	
 	SelectionKey selectionKey;
@@ -58,14 +63,20 @@ public class NioSession {
 		return selectionKey.isValid()&&selectionKey.isWritable();
 	}
 
-	public void read() throws IOException {
-		int read  = socketChannel.read(buffer);
+	public void read() throws IOException   {
+		
+		int read = -1;
+		try {
+			read = socketChannel.read(buffer);
+		} catch (IOException e) {
+			close();
+			return;
+		}
 		if(read == -1){
 			close();
 		}
 		if(read > 0){
 			buffer.flip();
-		//	ioHandler.onReadData(this,buffer);
 			this.getProcessor().getIoFilterChain().fireMessageReceived(this,buffer);
 			buffer.compact();
 		}
@@ -136,6 +147,7 @@ public class NioSession {
 	}
 	
 	public void close() throws IOException{
+		logger.info("sessionID={} is closeing",sessionId);
 		selectionKey.cancel();
 		socketChannel.close();
 	}

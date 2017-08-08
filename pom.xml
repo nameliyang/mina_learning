@@ -22,13 +22,13 @@
 		    <artifactId>httpclient</artifactId>
 		    <version>4.3.6</version>
 		</dependency>
-		<!-- 
+		
 		    <dependency>
 		      <groupId>org.eclipse.jetty</groupId>
 		      <artifactId>jetty-http</artifactId>
 		      <version>9.4.7-SNAPSHOT</version>
 		    </dependency>
-     	-->
+     	
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>

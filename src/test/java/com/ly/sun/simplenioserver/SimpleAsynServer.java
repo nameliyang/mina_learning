@@ -63,7 +63,8 @@ public class SimpleAsynServer implements Runnable {
 							socketChannel.configureBlocking(false);
 							NioSession session = new NioSession(ioProcessor,socketChannel);
 							session.setIoHandler(ioHandler);
-							session.getProcessor().addAcceptorSession(session);
+							IoProcessor processor = session.getProcessor();
+							processor.addAcceptorSession(session);
 						} catch (IOException e) {
 							e.printStackTrace();
 						}
@@ -83,7 +84,7 @@ public class SimpleAsynServer implements Runnable {
 	
 	public static void main(String[] args) throws IOException {
 		
-		SimpleAsynServer server = new SimpleAsynServer(16);
+		SimpleAsynServer server = new SimpleAsynServer(2);
 		server.setIoHandler(new IoHandler());
 		server.addIoFilter(new ProtocolCodecFilter("protocolFilter"));
 		server.bind(8080).start();

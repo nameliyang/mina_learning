@@ -21,16 +21,18 @@ public class IoProcessor {
 	
 	Selector selector;
 	
-	private  final Queue<NioSession> acceptorSessions = new ConcurrentLinkedQueue<NioSession>();
+	private    final Queue<NioSession> acceptorSessions = new ConcurrentLinkedQueue<NioSession>();
 	
-	private   final AtomicReference<Acceptor> accepotr = new AtomicReference<Acceptor>();
+	private    final AtomicReference<Acceptor> accepotr = new AtomicReference<Acceptor>();
 	
-	private   final Queue<NioSession> flushSessions = new ConcurrentLinkedQueue<NioSession>();
+	private    final Queue<NioSession> flushSessions = new ConcurrentLinkedQueue<NioSession>();
 	
 	private static final IoFilterChain ioFilterChain = new DefaultIoFilterChain();
 
 //	private static final int DEFAULT_IOPROCESSOR = 1;
 	private IoProcessor[] ioProcessors ;
+	
+	private int processId;
 	
 	private  IoProcessor() throws IOException {
 		
@@ -41,6 +43,7 @@ public class IoProcessor {
 		for(int i = 0;i<processorCount;i++){
 			ioProcessors[i] = new IoProcessor();
 			ioProcessors[i].selector = Selector.open();
+			ioProcessors[i].processId = i;
 		}
 	}
 	
@@ -97,7 +100,10 @@ public class IoProcessor {
 	public void addFlushSession(NioSession session){
 		flushSessions.add(session);
 	}
-	
+	@Override
+	public String toString() {
+		return "processId="+processId;
+	}
 	class Acceptor implements Runnable{
 
 		@Override
@@ -117,7 +123,8 @@ public class IoProcessor {
 							SelectionKey key = iterator.next();
 							iterator.remove();
 							NioSession nioSession = (NioSession) key.attachment();
-							nioSession.getProcessor().process(nioSession);
+							IoProcessor processor = nioSession.getProcessor();
+						    processor.process(nioSession);
 						}
 					}
 					flush();
@@ -132,7 +139,8 @@ public class IoProcessor {
 				flush(session);
 			}
 		}
-
+		
+		
 		private void flush(NioSession session) {
 			session.setFlushable(false);
 			Queue<Object> messageQueue = session.getMessageQueue();
