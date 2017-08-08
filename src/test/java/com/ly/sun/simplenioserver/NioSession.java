@@ -60,6 +60,9 @@ public class NioSession {
 
 	public void read() throws IOException {
 		int read  = socketChannel.read(buffer);
+		if(read == -1){
+			close();
+		}
 		if(read > 0){
 			buffer.flip();
 		//	ioHandler.onReadData(this,buffer);
@@ -131,4 +134,10 @@ public class NioSession {
 	public IoHandler getIoHandler(){
 		return ioHandler;
 	}
+	
+	public void close() throws IOException{
+		selectionKey.cancel();
+		socketChannel.close();
+	}
+	
 }

@@ -83,7 +83,7 @@ public class SimpleAsynServer implements Runnable {
 	
 	public static void main(String[] args) throws IOException {
 		
-		SimpleAsynServer server = new SimpleAsynServer(1);
+		SimpleAsynServer server = new SimpleAsynServer(16);
 		server.setIoHandler(new IoHandler());
 		server.addIoFilter(new ProtocolCodecFilter("protocolFilter"));
 		server.bind(8080).start();

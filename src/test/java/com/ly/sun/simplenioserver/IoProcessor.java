@@ -12,8 +12,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicReference;
 
-import org.glassfish.grizzly.filterchain.FilterChain;
-
 import com.ly.sun.simplenioserver.fiterchain.DefaultIoFilterChain;
 import com.ly.sun.simplenioserver.fiterchain.IoFilterChain;
 
@@ -23,11 +21,11 @@ public class IoProcessor {
 	
 	Selector selector;
 	
-	private static final Queue<NioSession> acceptorSessions = new ConcurrentLinkedQueue<NioSession>();
+	private  final Queue<NioSession> acceptorSessions = new ConcurrentLinkedQueue<NioSession>();
 	
-	private static final AtomicReference<Acceptor> accepotr = new AtomicReference<Acceptor>();
+	private   final AtomicReference<Acceptor> accepotr = new AtomicReference<Acceptor>();
 	
-	private static final Queue<NioSession> flushSessions = new ConcurrentLinkedQueue<NioSession>();
+	private   final Queue<NioSession> flushSessions = new ConcurrentLinkedQueue<NioSession>();
 	
 	private static final IoFilterChain ioFilterChain = new DefaultIoFilterChain();
 
@@ -86,9 +84,14 @@ public class IoProcessor {
 
 	public void addAcceptorSession(NioSession session) {
 		acceptorSessions.add(session);
+		wakeup();
 		if(accepotr.compareAndSet(null, new Acceptor())){
 			servicePool.submit(accepotr.get());
 		}
+	}
+	
+	public void wakeup(){
+		selector.wakeup();
 	}
 	
 	public void addFlushSession(NioSession session){
@@ -103,6 +106,9 @@ public class IoProcessor {
 				try {
 					registerSelector();
 					int select = selector.select();
+//					Set<SelectionKey> keys = selector.keys();
+//					SelectionKey test = keys.iterator().next();
+//					System.out.println(test.interestOps() ==SelectionKey.OP_READ);
 					if(select > 0){
 						Set<SelectionKey> selectedKeys = selector.selectedKeys();
 						Iterator<SelectionKey> iterator = selectedKeys.iterator();
